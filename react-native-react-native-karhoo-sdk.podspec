@@ -9,10 +9,9 @@ Pod::Spec.new do |s|
   s.description  = <<-DESC
                   react-native-react-native-karhoo-sdk
                    DESC
-  s.homepage     = "https://github.com/github_account/react-native-react-native-karhoo-sdk"
-  s.license      = "MIT"
-  # s.license    = { :type => "MIT", :file => "FILE_LICENSE" }
-  s.authors      = { "Your Name" => "yourname@email.com" }
+  s.homepage     = package["homepage"]
+  s.license      = package["licence"]
+  s.authors      = package["author"]
   s.platforms    = { :ios => "9.0" }
   s.source       = { :git => "https://github.com/github_account/react-native-react-native-karhoo-sdk.git", :tag => "#{s.version}" }
 
@@ -20,7 +19,5 @@ Pod::Spec.new do |s|
   s.requires_arc = true
 
   s.dependency "React"
-  # ...
-  # s.dependency "..."
 end
 
