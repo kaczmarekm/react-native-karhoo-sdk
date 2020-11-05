@@ -1,41 +1,34 @@
 package com.iteratorsmobile;
 
-import android.content.Context;
-import android.graphics.drawable.Drawable;
-import com.karhoo.samples.uisdk.components.R;
-import com.karhoo.sdk.analytics.AnalyticProvider;
-import com.karhoo.sdk.api.KarhooEnvironment;
-import com.karhoo.sdk.api.model.AuthenticationMethod;
-import com.karhoo.uisdk.KarhooUISDKConfiguration;
+import android.content.Context
+import com.facebook.react.bridge.ReactContext
+import com.karhoo.sdk.analytics.AnalyticProvider
+import com.karhoo.sdk.api.KarhooApi
+import com.karhoo.sdk.api.KarhooEnvironment
+import com.karhoo.sdk.api.KarhooSDKConfiguration
+import com.karhoo.sdk.api.model.AuthenticationMethod
 
-class KarhooConfiguration(private val context: Context) : ConfigContract.Module {
-
-    override fun karhooUserConfiguration(): KarhooUISDKConfiguration {
-        return KarhooConfig(
-            context
-        )
+class KarhooConfiguration(context: ReactContext) : KarhooSDKConfiguration {
+    override fun environment(): KarhooEnvironment {
+        return KarhooEnvironment.Sandbox()
     }
 
-    class KarhooConfig(private val context: Context) : KarhooUISDKConfiguration {
+    override fun context(): Context {
+        return context
+    }
 
-        override fun context(): Context {
-            return context
-        }
+    override fun analyticsProvider(): AnalyticProvider? {
+        return null
+    }
 
-        override fun environment(): KarhooEnvironment {
-            return KarhooEnvironment.Sandbox()
-        }
+    override fun authenticationMethod(): AuthenticationMethod {
+        return AuthenticationMethod.KarhooUser()
+    }
 
-        override fun analyticsProvider(): AnalyticProvider? {
-            return null
-        }
-
-        override fun authenticationMethod(): AuthenticationMethod {
-            return AuthenticationMethod.KarhooUser()
-        }
-
-        override fun logo(): Drawable? {
-            return context.getDrawable(R.drawable.uisdk_ic_labs)
+    companion object {
+        @kotlin.jvm.JvmStatic
+        fun initialize(context: ReactContext) {
+            KarhooApi.setConfiguration(configuration = KarhooConfiguration(context = context));
         }
     }
 }
