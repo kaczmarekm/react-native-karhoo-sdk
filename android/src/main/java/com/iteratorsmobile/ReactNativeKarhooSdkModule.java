@@ -1,9 +1,11 @@
 package com.iteratorsmobile;
 
+import android.util.Log;
+import com.facebook.react.bridge.Callback;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
-import com.facebook.react.bridge.Callback;
+import com.karhoo.sdk.api.KarhooApi;
 
 public class ReactNativeKarhooSdkModule extends ReactContextBaseJavaModule {
 
@@ -20,8 +22,10 @@ public class ReactNativeKarhooSdkModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void sampleMethod(String stringArgument, int numberArgument, Callback callback) {
-        // TODO: Implement some actually useful functionality
-        callback.invoke("Received numberArgument: " + numberArgument + " stringArgument: " + stringArgument);
+    public void initialize(String identifier, String referer, String organisationId) {
+        Log.d("XXX", "identifier: " + identifier + ", " + "referer: " + referer + ", " + organisationId);
+        KarhooApi.setConfiguration(new KarhooConfig(this.reactContext));
     }
 }
+
+

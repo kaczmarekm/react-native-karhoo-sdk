@@ -19,7 +19,7 @@ Pod::Spec.new do |s|
   s.requires_arc = true
 
   s.dependency "KarhooSDK"
-  s.dependency "KarhooUISDK"
+  s.dependency "BraintreeDropIn"
   s.dependency "React"
 end
 

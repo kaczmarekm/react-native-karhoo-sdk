@@ -15,7 +15,9 @@
   },
   "keywords": [
     "react-native",
-    "karhoo"
+    "karhoo",
+    "braintree",
+    "braintreeDropin"
   ],
   "author": "Mateusz Kaczmarek",
   "license": "MIT",

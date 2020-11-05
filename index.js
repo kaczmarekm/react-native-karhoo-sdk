@@ -2,4 +2,8 @@ import { NativeModules } from 'react-native';
 
 const { ReactNativeKarhooSdk } = NativeModules;
 
-export default ReactNativeKarhooSdk;
+export default {
+    initialize: (identifier, referer, organisationId) => {
+        return ReactNativeKarhooSdk.initialize(identifier, referer, organisationId)
+    }
+};

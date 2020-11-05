@@ -1,14 +1,11 @@
 #import "ReactNativeKarhooSdk.h"
+#import <React/RCTBridgeModule.h>
 
 
-@implementation ReactNativeKarhooSdk
+@interface RCT_EXTERN_MODULE(CalendarManager, NSObject)
 
 RCT_EXPORT_MODULE()
 
-RCT_EXPORT_METHOD(sampleMethod:(NSString *)stringArgument numberParameter:(nonnull NSNumber *)numberArgument callback:(RCTResponseSenderBlock)callback)
-{
-    // TODO: Implement some actually useful functionality
-    callback(@[[NSString stringWithFormat: @"numberArgument: %@ stringArgument: %@", numberArgument, stringArgument]]);
-}
+RCT_EXTERN_METHOD(initialize:(NSString *)identifier referer:(NSString *)referer organisationId:(NSString *)organisationId)
 
 @end
