@@ -8,7 +8,7 @@ import com.karhoo.sdk.api.KarhooEnvironment
 import com.karhoo.sdk.api.KarhooSDKConfiguration
 import com.karhoo.sdk.api.model.AuthenticationMethod
 
-class KarhooConfiguration(context: ReactContext) : KarhooSDKConfiguration {
+class KarhooConfiguration(private val context: ReactContext) : KarhooSDKConfiguration {
     override fun environment(): KarhooEnvironment {
         return KarhooEnvironment.Sandbox()
     }
