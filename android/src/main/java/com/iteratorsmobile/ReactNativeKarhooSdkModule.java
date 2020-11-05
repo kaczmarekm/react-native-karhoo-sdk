@@ -1,6 +1,5 @@
 package com.iteratorsmobile;
 
-import android.util.Log;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
@@ -21,8 +20,7 @@ public class ReactNativeKarhooSdkModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void initialize(String identifier, String referer, String organisationId) {
-        Log.d("XXX", "identifier: " + identifier + ", " + "referer: " + referer + ", " + organisationId);
-        KarhooConfiguration.initialize(this.reactContext);
+        KarhooConfiguration.initialize(this.reactContext, identifier, referer, organisationId);
     }
 }
 
