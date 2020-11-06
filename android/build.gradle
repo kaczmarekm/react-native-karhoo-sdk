@@ -80,6 +80,13 @@ repositories {
     maven {
         url 'https://flit-tech.bintray.com/Android'
     }
+    maven {
+        url "https://cardinalcommerce.bintray.com/android"
+        credentials {
+            username 'braintree-team-sdk@cardinalcommerce'
+            password '220cc9476025679c4e5c843666c27d97cfb0f951'
+        }
+    }
 }
 
 

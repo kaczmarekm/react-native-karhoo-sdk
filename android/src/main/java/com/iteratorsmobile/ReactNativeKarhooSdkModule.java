@@ -22,6 +22,11 @@ public class ReactNativeKarhooSdkModule extends ReactContextBaseJavaModule {
     public void initialize(String identifier, String referer, String organisationId) {
         KarhooConfiguration.initialize(this.reactContext, identifier, referer, organisationId);
     }
+
+    @ReactMethod
+    public void initializePaymentForGuest(String organisationId, String currency) {
+        KarhooPayments.initializePaymentForGuest(this.reactContext, organisationId, currency);
+    }
 }
 
 

@@ -29,14 +29,13 @@ class KarhooConfiguration(
     }
 
     override fun authenticationMethod(): AuthenticationMethod {
-        Log.d("XXX", this.identifier + " | " + this.referer + " | " + this.organisationId)
         return AuthenticationMethod.Guest(identifier = this.identifier, referer = this.referer, organisationId = this.organisationId)
     }
 
     companion object {
         @kotlin.jvm.JvmStatic
         fun initialize(context: ReactContext, identifier : String, referer: String, organisationId: String) {
-            KarhooApi.setConfiguration(configuration = KarhooConfiguration(context = context, identifier = identifier, referer = referer, organisationId = organisationId));
+            KarhooApi.setConfiguration(configuration = KarhooConfiguration(context = context, identifier = identifier, referer = referer, organisationId = organisationId));              
         }
     }
 }

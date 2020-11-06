@@ -5,5 +5,8 @@ const { ReactNativeKarhooSdk } = NativeModules;
 export default {
     initialize: (identifier, referer, organisationId) => {
         return ReactNativeKarhooSdk.initialize(identifier, referer, organisationId)
+    },
+    initializePaymentForGuest: (organisationId, currency) => {
+        return ReactNativeKarhooSdk.initializePaymentForGuest(organisationId, currency)
     }
 };
