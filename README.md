@@ -6,6 +6,16 @@
 
 ### Installation
 
+* update Podfile
+** add
+`use_modular_headers!`
+
+** update 
+`
+    pod 'glog', :podspec => '../node_modules/react-native/third-party-podspecs/glog.podspec', :modular_headers => false
+    pod 'Folly', :podspec => '../node_modules/react-native/third-party-podspecs/Folly.podspec', :modular_headers => false
+`
+
 * add to project level `build.gradle`:
 `maven { url 'https://flit-tech.bintray.com/Android' }`
 

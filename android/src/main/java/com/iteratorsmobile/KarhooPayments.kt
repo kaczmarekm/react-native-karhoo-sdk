@@ -24,11 +24,7 @@ import com.braintreepayments.api.ThreeDSecure
 import com.karhoo.sdk.api.model.UserInfo
 import com.braintreepayments.api.models.ThreeDSecureRequest
 import com.braintreepayments.api.interfaces.BraintreeErrorListener
-
-
-
 import java.util.*
-
 
 class KarhooPayments {
     companion object {
