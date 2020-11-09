@@ -28,16 +28,37 @@ public class KarhooSdkModule extends ReactContextBaseJavaModule implements Activ
 
     private final ReactApplicationContext reactContext;
 
-    private Promise paymentForGuestPromise;
+    private Promise paymentNoncePromise;
 
     public KarhooSdkModule(ReactApplicationContext reactContext) {
         super(reactContext);
         this.reactContext = reactContext;
+        reactContext.addActivityEventListener(this);
     }
 
     @Override
     public String getName() {
         return "KarhooSdk";
+    }
+
+    public void onActivityResult(Activity activity, int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_CODE) {
+            if (resultCode == Activity.RESULT_OK) {
+                DropInResult result = data.getParcelableExtra(DropInResult.EXTRA_DROP_IN_RESULT);
+                PaymentMethodNonce nonce = result.getPaymentMethodNonce();
+                WritableMap response = Arguments.createMap();
+                response.putString("nonce", nonce != null ? nonce.getNonce() : null);
+                paymentNoncePromise.resolve(response);
+            } else if (resultCode == Activity.RESULT_CANCELED) {
+                paymentNoncePromise.reject(EVENT_CANCELLED, "Cancelled.");
+            } else {
+                Exception error = (Exception) data.getSerializableExtra(DropInActivity.EXTRA_ERROR);
+                paymentNoncePromise.reject(EVENT_FAILED, error);
+            }
+        }
+    }
+
+    public void onNewIntent(Intent intent) {
     }
 
     @ReactMethod
@@ -54,50 +75,29 @@ public class KarhooSdkModule extends ReactContextBaseJavaModule implements Activ
             return;
         }
 
-        paymentForGuestPromise = promise;
+        paymentNoncePromise = promise;
 
         try {
             SDKInitRequest sdkInitRequest = new SDKInitRequest(organisationId, currency);
-            KarhooApi.INSTANCE.getPaymentsService().initialisePaymentSDK(sdkInitRequest).execute(new Function1<Resource<? extends BraintreeSDKToken>, Unit>() {
-                @Override
-                public Unit invoke(Resource<? extends BraintreeSDKToken> resource) {
-                    if (resource instanceof Resource.Success) {                        
-                        String clientToken = ((Resource.Success<BraintreeSDKToken>) resource).getData().getToken();
-                        DropInRequest dropInRequest = new DropInRequest().clientToken(clientToken);
-                        currentActivity.startActivityForResult(dropInRequest.getIntent(reactContext), REQUEST_CODE);
-                    } else {
-                        paymentForGuestPromise.reject(EVENT_FAILED, ((Resource.Failure) resource).getError().getUserFriendlyMessage());
-                        paymentForGuestPromise = null;
+            KarhooApi.INSTANCE.getPaymentsService().initialisePaymentSDK(sdkInitRequest).execute(
+                    new Function1<Resource<? extends BraintreeSDKToken>, Unit>() {
+                        @Override
+                        public Unit invoke(Resource<? extends BraintreeSDKToken> resource) {
+                            if (resource instanceof Resource.Success) {
+                                String clientToken = ((Resource.Success<BraintreeSDKToken>) resource).getData().getToken();
+                                DropInRequest dropInRequest = new DropInRequest().clientToken(clientToken);
+                                currentActivity.startActivityForResult(dropInRequest.getIntent(reactContext), REQUEST_CODE);
+                            } else {
+                                paymentNoncePromise.reject(EVENT_FAILED, ((Resource.Failure) resource).getError().getUserFriendlyMessage());
+                                paymentNoncePromise = null;
+                            }
+                            return Unit.INSTANCE;
+                        }
                     }
-                    return Unit.INSTANCE;
-                }
-            });
+            );
         } catch (Exception e) {
-            paymentForGuestPromise.reject(EVENT_FAILED, e);
-            paymentForGuestPromise = null;
-        }    
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_CODE) {
-            if (resultCode == Activity.RESULT_OK) {
-                DropInResult result = data.getParcelableExtra(DropInResult.EXTRA_DROP_IN_RESULT);
-                PaymentMethodNonce nonce = result.getPaymentMethodNonce();
-                WritableMap response = Arguments.createMap();
-                response.putString("nonce", nonce != null ? nonce.getNonce() : null);
-                paymentForGuestPromise.resolve(response);
-            } else if (resultCode == Activity.RESULT_CANCELED) {
-                paymentForGuestPromise.reject(EVENT_CANCELLED, "Cancelled.");
-            } else {
-                Exception error = (Exception) data.getSerializableExtra(DropInActivity.EXTRA_ERROR);
-                paymentForGuestPromise.reject(EVENT_FAILED, error);
-            }
+            paymentNoncePromise.reject(EVENT_FAILED, e);
+            paymentNoncePromise = null;
         }
     }
-
-    @Override
-    public void onNewIntent(Intent intent) {};
 }
-
-
