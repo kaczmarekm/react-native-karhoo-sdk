@@ -20,9 +20,11 @@ def safeExtGet(prop, fallback) {
 }
 
 apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
 apply plugin: 'maven'
 
 buildscript {
+    ext.kotlin_version = "1.4.10"
     // The Android Gradle plugin is only required when opening the android folder stand-alone.
     // This avoids unnecessary downloads and potential conflicts when the library is included as a
     // module dependency in an application project.
@@ -31,10 +33,16 @@ buildscript {
         repositories {
             google()
             jcenter()
-        }
+         }
         dependencies {
             classpath 'com.android.tools.build:gradle:3.4.1'
         }
+    }
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
 }
 
@@ -68,11 +76,25 @@ repositories {
     }
     google()
     jcenter()
+    maven {
+        url 'https://flit-tech.bintray.com/Android'
+    }
+    maven {
+        url "https://cardinalcommerce.bintray.com/android"
+        credentials {
+            username 'braintree-team-sdk@cardinalcommerce'
+            password '220cc9476025679c4e5c843666c27d97cfb0f951'
+        }
+    }
 }
+
 
 dependencies {
     //noinspection GradleDynamicVersion
     implementation 'com.facebook.react:react-native:+'  // From node_modules
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation 'com.braintreepayments.api:drop-in:4.6.0'
+    api 'com.karhoo:nsdk-canary:1.0.35.30092020-3'
 }
 
 def configureReactNativePom(def pom) {
@@ -96,8 +118,8 @@ def configureReactNativePom(def pom) {
 
         developers {
             developer {
-                id packageJson.author.username
-                name packageJson.author.name
+                id packageJson.author
+                name packageJson.author
             }
         }
     }

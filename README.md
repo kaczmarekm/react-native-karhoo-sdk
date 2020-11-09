@@ -26,11 +26,11 @@
 
 ###### import
 ```javascript
-import ReactNativeKarhooSdk from 'react-native-react-native-karhoo-sdk';
+import KarhooSdk from 'react-native-react-native-karhoo-sdk';
 ```
 ###### initialize
 ```javascript
-ReactNativeKarhooSdk.initialize(
+KarhooSdk.initialize(
     identifier: String,
     referer: String,
     organisationId: String
