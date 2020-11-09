@@ -2,6 +2,6 @@
 <Workspace
    version = "1.0">
    <FileRef
-      location = "group:ReactNativeKarhooSdk.xcodeproj">
+      location = "group:KarhooSdk.xcodeproj">
    </FileRef>
 </Workspace>

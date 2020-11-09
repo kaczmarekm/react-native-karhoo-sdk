@@ -7,8 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		600AF14325557D8000986CB5 /* KarhooModule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 600AF14225557D8000986CB5 /* KarhooModule.swift */; };
-		B3E7B58A1CC2AC0600A0062D /* ReactNativeKarhooSdk.m in Sources */ = {isa = PBXBuildFile; fileRef = B3E7B5891CC2AC0600A0062D /* ReactNativeKarhooSdk.m */; };
+		606D9E902559444400655B7E /* KarhooSdk.swift in Sources */ = {isa = PBXBuildFile; fileRef = 606D9E8F2559444400655B7E /* KarhooSdk.swift */; };
+		B3E7B58A1CC2AC0600A0062D /* KarhooSdk.m in Sources */ = {isa = PBXBuildFile; fileRef = B3E7B5891CC2AC0600A0062D /* KarhooSdk.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -24,11 +24,10 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		134814201AA4EA6300B7C361 /* libReactNativeKarhooSdk.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libReactNativeKarhooSdk.a; sourceTree = BUILT_PRODUCTS_DIR; };
-		600AF13325557A5800986CB5 /* ReactNativeKarhooSdk-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "ReactNativeKarhooSdk-Bridging-Header.h"; sourceTree = "<group>"; };
-		600AF14225557D8000986CB5 /* KarhooModule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = KarhooModule.swift; path = "/Users/mateuszkaczmarek/WORKSPACE/react-native-karhoo-sdk/ios/KarhooModule.swift"; sourceTree = "<absolute>"; };
-		B3E7B5881CC2AC0600A0062D /* ReactNativeKarhooSdk.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ReactNativeKarhooSdk.h; sourceTree = "<group>"; };
-		B3E7B5891CC2AC0600A0062D /* ReactNativeKarhooSdk.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ReactNativeKarhooSdk.m; sourceTree = "<group>"; };
+		134814201AA4EA6300B7C361 /* libKarhooSdk.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libKarhooSdk.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		606D9E8E2559444300655B7E /* KarhooSdk-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "KarhooSdk-Bridging-Header.h"; sourceTree = "<group>"; };
+		606D9E8F2559444400655B7E /* KarhooSdk.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KarhooSdk.swift; sourceTree = "<group>"; };
+		B3E7B5891CC2AC0600A0062D /* KarhooSdk.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KarhooSdk.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -45,7 +44,7 @@
 		134814211AA4EA7D00B7C361 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				134814201AA4EA6300B7C361 /* libReactNativeKarhooSdk.a */,
+				134814201AA4EA6300B7C361 /* libKarhooSdk.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -53,20 +52,19 @@
 		58B511D21A9E6C8500147676 = {
 			isa = PBXGroup;
 			children = (
-				600AF14225557D8000986CB5 /* KarhooModule.swift */,
-				B3E7B5881CC2AC0600A0062D /* ReactNativeKarhooSdk.h */,
-				B3E7B5891CC2AC0600A0062D /* ReactNativeKarhooSdk.m */,
+				606D9E8F2559444400655B7E /* KarhooSdk.swift */,
+				B3E7B5891CC2AC0600A0062D /* KarhooSdk.m */,
 				134814211AA4EA7D00B7C361 /* Products */,
-				600AF13325557A5800986CB5 /* ReactNativeKarhooSdk-Bridging-Header.h */,
+				606D9E8E2559444300655B7E /* KarhooSdk-Bridging-Header.h */,
 			);
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		58B511DA1A9E6C8500147676 /* ReactNativeKarhooSdk */ = {
+		58B511DA1A9E6C8500147676 /* KarhooSdk */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 58B511EF1A9E6C8500147676 /* Build configuration list for PBXNativeTarget "ReactNativeKarhooSdk" */;
+			buildConfigurationList = 58B511EF1A9E6C8500147676 /* Build configuration list for PBXNativeTarget "KarhooSdk" */;
 			buildPhases = (
 				58B511D71A9E6C8500147676 /* Sources */,
 				58B511D81A9E6C8500147676 /* Frameworks */,
@@ -76,9 +74,9 @@
 			);
 			dependencies = (
 			);
-			name = ReactNativeKarhooSdk;
+			name = KarhooSdk;
 			productName = RCTDataManager;
-			productReference = 134814201AA4EA6300B7C361 /* libReactNativeKarhooSdk.a */;
+			productReference = 134814201AA4EA6300B7C361 /* libKarhooSdk.a */;
 			productType = "com.apple.product-type.library.static";
 		};
 /* End PBXNativeTarget section */
@@ -96,7 +94,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 58B511D61A9E6C8500147676 /* Build configuration list for PBXProject "ReactNativeKarhooSdk" */;
+			buildConfigurationList = 58B511D61A9E6C8500147676 /* Build configuration list for PBXProject "KarhooSdk" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
@@ -109,7 +107,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				58B511DA1A9E6C8500147676 /* ReactNativeKarhooSdk */,
+				58B511DA1A9E6C8500147676 /* KarhooSdk */,
 			);
 		};
 /* End PBXProject section */
@@ -119,8 +117,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B3E7B58A1CC2AC0600A0062D /* ReactNativeKarhooSdk.m in Sources */,
-				600AF14325557D8000986CB5 /* KarhooModule.swift in Sources */,
+				606D9E902559444400655B7E /* KarhooSdk.swift in Sources */,
+				B3E7B58A1CC2AC0600A0062D /* KarhooSdk.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -233,9 +231,9 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				OTHER_LDFLAGS = "-ObjC";
-				PRODUCT_NAME = ReactNativeKarhooSdk;
+				PRODUCT_NAME = KarhooSdk;
 				SKIP_INSTALL = YES;
-				SWIFT_OBJC_BRIDGING_HEADER = "ReactNativeKarhooSdk-Bridging-Header.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "KarhooSdk-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 			};
@@ -254,9 +252,9 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				OTHER_LDFLAGS = "-ObjC";
-				PRODUCT_NAME = ReactNativeKarhooSdk;
+				PRODUCT_NAME = KarhooSdk;
 				SKIP_INSTALL = YES;
-				SWIFT_OBJC_BRIDGING_HEADER = "ReactNativeKarhooSdk-Bridging-Header.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "KarhooSdk-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 			};
 			name = Release;
@@ -264,7 +262,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		58B511D61A9E6C8500147676 /* Build configuration list for PBXProject "ReactNativeKarhooSdk" */ = {
+		58B511D61A9E6C8500147676 /* Build configuration list for PBXProject "KarhooSdk" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				58B511ED1A9E6C8500147676 /* Debug */,
@@ -273,7 +271,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		58B511EF1A9E6C8500147676 /* Build configuration list for PBXNativeTarget "ReactNativeKarhooSdk" */ = {
+		58B511EF1A9E6C8500147676 /* Build configuration list for PBXNativeTarget "KarhooSdk" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				58B511F01A9E6C8500147676 /* Debug */,
