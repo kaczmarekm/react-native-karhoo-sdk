@@ -9,8 +9,8 @@ class KarhooSdk: NSObject {
         Karhoo.set(configuration: KarhooConfiguration(identifier: identifier, referer: referer, organisationId: organisationId))
     }
 
-    @objc(initializePaymentForGuest:currency:resolver:rejecter:)
-    func initializePaymentForGuest(organisationId: String, currency: String, resolver resolve: @escaping RCTPromiseResolveBlock, rejecter reject: @escaping RCTPromiseRejectBlock) -> Void {
+    @objc(getPaymentNonce:currency:resolver:rejecter:)
+    func getPaymentNonce(organisationId: String, currency: String, resolver resolve: @escaping RCTPromiseResolveBlock, rejecter reject: @escaping RCTPromiseRejectBlock) -> Void {
         Karhoo.getPaymentService().initialisePaymentSDK(paymentSDKTokenPayload: PaymentSDKTokenPayload(organisationId: organisationId, currency: currency))
             .execute { result in
                 switch result {

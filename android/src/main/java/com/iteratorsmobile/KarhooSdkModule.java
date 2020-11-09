@@ -46,7 +46,7 @@ public class KarhooSdkModule extends ReactContextBaseJavaModule implements Activ
     }
 
     @ReactMethod
-    public void initializePaymentForGuest(String organisationId, String currency, final Promise promise) {
+    public void getPaymentNonce(String organisationId, String currency, final Promise promise) {
         final Activity currentActivity = getCurrentActivity();
 
         if (currentActivity == null) {
@@ -95,6 +95,10 @@ public class KarhooSdkModule extends ReactContextBaseJavaModule implements Activ
             }
         }
     }
+
+    @Override
+    public void onNewIntent(Intent intent) {
+    };
 }
 
 

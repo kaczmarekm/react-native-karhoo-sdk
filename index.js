@@ -6,7 +6,7 @@ export default {
     initialize: (identifier, referer, organisationId) => {
         return KarhooSdk.initialize(identifier, referer, organisationId)
     },
-    initializePaymentForGuest: (organisationId, currency) => {
-        return KarhooSdk.initializePaymentForGuest(organisationId, currency)
+    getPaymentNonce: (organisationId, currency) => {
+        return KarhooSdk.getPaymentNonce(organisationId, currency)
     }
 };
