@@ -1,6 +1,6 @@
 {
-  "name": "react-native-react-native-karhoo-sdk",
-  "title": "React Native React Native Karhoo Sdk",
+  "name": "react-native-karhoo-sdk",
+  "title": "React Native Karhoo Sdk",
   "version": "1.0.0",
   "description": "React-native bindings for KarhooSDK",
   "homepage": "https://github.com/iteratorsmobile/react-native-karhoo-sdk#README",
@@ -10,8 +10,8 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/iteratorsmobile/react-native-react-native-karhoo-sdk.git",
-    "baseUrl": "https://github.com/iteratorsmobile/react-native-react-native-karhoo-sdk"
+    "url": "git+https://github.com/iteratorsmobile/react-native-karhoo-sdk.git",
+    "baseUrl": "https://github.com/iteratorsmobile/react-native-karhoo-sdk"
   },
   "keywords": [
     "react-native",

@@ -97,8 +97,7 @@ public class KarhooSdkModule extends ReactContextBaseJavaModule implements Activ
     }
 
     @Override
-    public void onNewIntent(Intent intent) {
-    };
+    public void onNewIntent(Intent intent) {};
 }
 
 
