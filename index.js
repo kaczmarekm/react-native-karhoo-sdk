@@ -6,7 +6,7 @@ const { KarhooSdk } = NativeModules;
 export default {
     initialize: (identifier, referer, organisationId) => KarhooSdk.initialize(identifier, referer, organisationId),
     getPaymentNonce: (organisationId, currency) => KarhooSdk.getPaymentNonce(organisationId, currency),
-    bookTrip: (userInfo, quoteId, paymentNonce) => KarhooSdk.bookTrip(userInfo, quoteId, paymentNonce),
+    bookTrip: (passenger, quoteId, paymentNonce) => KarhooSdk.bookTrip(passenger, quoteId, paymentNonce),
 };
 
 export {

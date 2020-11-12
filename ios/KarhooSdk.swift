@@ -46,14 +46,14 @@ class KarhooSdk: NSObject {
     }
 
     @objc(bookTrip:quoteId:paymentNonce:)
-    func bookTrip(userInfo: NSDictionary, quoteId: String, paymentNonce: String, resolver resolve: @escaping RCTPromiseRejectBlock, rejecter reject: @escaping RCTPromiseResolveBlock) -> Void {
+    func bookTrip(passenger: NSDictionary, quoteId: String, paymentNonce: String, resolver resolve: @escaping RCTPromiseRejectBlock, rejecter reject: @escaping RCTPromiseResolveBlock) -> Void {
         let tripService = Karhoo.getTripService()
         let passengerDetails = PassengerDetails(
-            firstName: userInfo["firstName"],
-            lastName: userInfo["lastName"],
-            email: userInfo["email"],
-            mobileNumber: userInfo["mobileNumber"],
-            locale: ["locale"]
+            firstName: passenger["firstName"],
+            lastName: passenger["lastName"],
+            email: passenger["email"],
+            mobileNumber: passenger["mobileNumber"],
+            locale: passenger["locale"]
         )
         let passengers = Passengers(additionalPassengers: 0, passengerDetails: [passengerDetails])
         let tripBooking = TripBooking(

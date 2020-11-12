@@ -112,14 +112,14 @@ public class KarhooSdkModule extends ReactContextBaseJavaModule implements Activ
     }
 
     @ReactMethod
-    public void bookTrip(ReadableMap userInfo, String quoteId, String paymentNonce, final Promise promise) {
+    public void bookTrip(ReadableMap passenger, String quoteId, String paymentNonce, final Promise promise) {
         try {
             List<PassengerDetails> passengersList = Collections.singletonList(new PassengerDetails(
-                    userInfo.getString("firstName"),
-                    userInfo.getString("lastName"),
-                    userInfo.getString("email"),
-                    userInfo.getString("mobileNumber"),
-                    userInfo.getString("locale")
+                    passenger.getString("firstName"),
+                    passenger.getString("lastName"),
+                    passenger.getString("email"),
+                    passenger.getString("mobileNumber"),
+                    passenger.getString("locale")
             ));
             Passengers passengers = new Passengers(0, passengersList);
             TripBooking tripBooking = new TripBooking(quoteId, passengers, null, null, paymentNonce);
