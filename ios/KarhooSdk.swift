@@ -19,7 +19,7 @@ class KarhooSdk: NSObject {
                         let dropIn = BTDropInController(authorization: sdk.token, request: request) {
                             (controller, result, error) in
                                 if (error != nil) {
-                                    print("KarhooSdk ERROR")
+                                    print("KarhooSdk ERROR \(error.code) \(error.message)")
                                     controller.dismiss(animated: true, completion: nil)                            
                                     reject(nil, nil, nil)
                                 } else if (result?.isCancelled == true) {
@@ -64,13 +64,13 @@ class KarhooSdk: NSObject {
         tripService.book(tripBooking: tripBooking).execute { result in
             switch result {
                 case .success(let trip):
-                    print("Trip: \(trip)")
+                    print("KarhooSdk SUCCESS: \(trip)")
                     var resultDict: NSDictionary = [   
                         "tripId": trip,                                                                     
                     ]
                     resolve(resultDict)
                 case .failure(let error):
-                    print("error: \(error.code) \(error.message)")
+                    print("KarhooSdk ERROR: \(error.code) \(error.message)")
                     reject(nil, nil, nil)
             }
         }
