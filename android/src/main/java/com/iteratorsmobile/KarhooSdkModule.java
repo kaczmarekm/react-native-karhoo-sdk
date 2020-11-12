@@ -12,11 +12,20 @@ import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
+import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableMap;
 import com.karhoo.sdk.api.KarhooApi;
 import com.karhoo.sdk.api.model.BraintreeSDKToken;
+import com.karhoo.sdk.api.model.TripInfo;
+import com.karhoo.sdk.api.network.request.PassengerDetails;
+import com.karhoo.sdk.api.network.request.Passengers;
 import com.karhoo.sdk.api.network.request.SDKInitRequest;
+import com.karhoo.sdk.api.network.request.TripBooking;
 import com.karhoo.sdk.api.network.response.Resource;
+
+import java.util.Collections;
+import java.util.List;
+
 import kotlin.Unit;
 import kotlin.jvm.functions.Function1;
 
@@ -25,6 +34,7 @@ public class KarhooSdkModule extends ReactContextBaseJavaModule implements Activ
     private static final String EVENT_ACTIVITY_DOES_NOT_EXIST = "EVENT_ACTIVITY_DOES_NOT_EXIST";
     private static final String EVENT_CANCELLED = "EVENT_CANCELLED";
     private static final String EVENT_FAILED = "EVENT_FAILED";
+    private static final String BOOKING_FAILED = "BOOKING_FAILED";
 
     private final ReactApplicationContext reactContext;
 
@@ -98,6 +108,37 @@ public class KarhooSdkModule extends ReactContextBaseJavaModule implements Activ
         } catch (Exception e) {
             paymentNoncePromise.reject(EVENT_FAILED, e);
             paymentNoncePromise = null;
+        }
+    }
+
+    @ReactMethod
+    public void bookTrip(ReadableMap userInfo, String quoteId, String paymentNonce, final Promise promise) {
+        try {
+            List<PassengerDetails> passengersList = Collections.singletonList(new PassengerDetails(
+                    userInfo.getString("firstName"),
+                    userInfo.getString("lastName"),
+                    userInfo.getString("email"),
+                    userInfo.getString("phoneNumber"),
+                    userInfo.getString("locale")
+            ));
+            Passengers passengers = new Passengers(0, passengersList);
+            TripBooking tripBooking = new TripBooking(quoteId, passengers, null, null, paymentNonce);
+            KarhooApi.INSTANCE.getTripService().book(tripBooking).execute(
+                    new Function1<Resource<? extends TripInfo>, Unit>() {
+                        @Override
+                        public Unit invoke(Resource<? extends TripInfo> resource) {
+                            if (resource instanceof Resource.Success) {
+                                String tripId = ((Resource.Success<TripInfo>) resource).getData().getTripId();
+                                promise.resolve(tripId);
+                            } else {
+                                promise.reject(BOOKING_FAILED, ((Resource.Failure) resource).getError().getUserFriendlyMessage());
+                            }
+                            return Unit.INSTANCE;
+                        }
+                    }
+            );
+        } catch (Exception e) {
+            promise.reject(BOOKING_FAILED, e);
         }
     }
 }

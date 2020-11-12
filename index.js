@@ -8,5 +8,8 @@ export default {
     },
     getPaymentNonce: (organisationId, currency) => {
         return KarhooSdk.getPaymentNonce(organisationId, currency)
+    },
+    bookTrip: (userInfo, quoteId, paymentNonce) => {
+        return KarhooSdk.bookTrip(userInfo, quoteId);
     }
 };
