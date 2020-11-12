@@ -2,16 +2,16 @@ interface GetPaymentNonceResponse {
     nonce: string;
 }
 
+interface BookTripResponse {
+    tripId: string;
+}
+
 interface UserInfo {
     firstName: string;
     lastName: string;
     email: string;
     mobileNumber: string;
     locale: string;
-    metadata?: string;
-}
-
-interface BookTripResponse {
 }
 
 export default {

@@ -40,8 +40,40 @@ class KarhooSdk: NSObject {
                         rootViewController?.present(dropIn!, animated: true, completion: nil)
                     case .failure(let error):
                         print("KarhooSdk ERROR: \(error?.code) \(error?.message)")
+                        reject(nil, nil, nil)
                 }
             }
+    }
+
+    @objc(bookTrip:quoteId:paymentNonce:)
+    func bookTrip(userInfo: NSDictionary, quoteId: String, paymentNonce: String, resolver resolve: @escaping RCTPromiseRejectBlock, rejecter reject: @escaping RCTPromiseResolveBlock) -> Void {
+        let tripService = Karhoo.getTripService()
+        let userInfo = UserInfo(
+            firstName: userInfo["firstName"],
+            lastName: userInfo["lastName"],
+            email: userInfo["email"],
+            mobileNumber: userInfo["mobileNumber"],
+            locale: ["locale"],
+            metadata: ""
+        )
+        let tripBooking = TripBooking(
+            quoteId: quoteId,
+            userInfo: userInfo,
+            flightNumber: nil
+        )
+        tripService.book(tripBooking: tripBooking).execute { result in
+            switch result {
+                case .success(let trip):
+                    print("Trip: \(trip)")
+                    var resultDict: NSDictionary = [   
+                        "tripId": trip,                                                                     
+                    ]
+                    resolve(resultDict)
+                case .failure(let error):
+                    print("error: \(error.code) \(error.message)")
+                    reject(nil, nil, nil)
+            }
+        }
     }
 }
 

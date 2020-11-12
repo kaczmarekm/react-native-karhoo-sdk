@@ -118,7 +118,7 @@ public class KarhooSdkModule extends ReactContextBaseJavaModule implements Activ
                     userInfo.getString("firstName"),
                     userInfo.getString("lastName"),
                     userInfo.getString("email"),
-                    userInfo.getString("phoneNumber"),
+                    userInfo.getString("mobileNumber"),
                     userInfo.getString("locale")
             ));
             Passengers passengers = new Passengers(0, passengersList);
@@ -129,7 +129,9 @@ public class KarhooSdkModule extends ReactContextBaseJavaModule implements Activ
                         public Unit invoke(Resource<? extends TripInfo> resource) {
                             if (resource instanceof Resource.Success) {
                                 String tripId = ((Resource.Success<TripInfo>) resource).getData().getTripId();
-                                promise.resolve(tripId);
+                                WritableMap response = Arguments.createMap();
+                                response.putString("tripId", tripId);
+                                promise.resolve(response);
                             } else {
                                 promise.reject(BOOKING_FAILED, ((Resource.Failure) resource).getError().getUserFriendlyMessage());
                             }
