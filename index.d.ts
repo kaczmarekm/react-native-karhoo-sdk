@@ -6,6 +6,11 @@ export interface BookTripResponse {
     tripId: string;
 }
 
+export interface PaymentData {
+    currency: string;
+    amount: string;
+}
+
 export interface Passenger {
     firstName: string;
     lastName: string;
@@ -16,6 +21,6 @@ export interface Passenger {
 
 export default {
     initialize: (identifier: string, referer: string, organisationId: string): void => {},
-    getPaymentNonce: (organisationId: string, currency: string): Promise<GetPaymentNonceResponse | null> => {},
+    getPaymentNonce: (organisationId: string, paymentData: PaymentData): Promise<GetPaymentNonceResponse | null> => {},
     bookTrip: (passenger: Passenger, quoteId: string, paymentNonce: string): Promise<BookTripResponse | null> => {}
 }
