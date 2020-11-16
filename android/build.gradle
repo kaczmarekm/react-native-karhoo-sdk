@@ -24,7 +24,7 @@ apply plugin: 'kotlin-android'
 apply plugin: 'maven'
 
 buildscript {
-    ext.kotlin_version = "1.4.10"
+    ext.kotlin_version = "1.3.72"
     // The Android Gradle plugin is only required when opening the android folder stand-alone.
     // This avoids unnecessary downloads and potential conflicts when the library is included as a
     // module dependency in an application project.
@@ -35,7 +35,7 @@ buildscript {
             jcenter()
          }
         dependencies {
-            classpath 'com.android.tools.build:gradle:3.4.1'
+            classpath 'com.android.tools.build:gradle:4.0.2'
         }
     }
     repositories {
@@ -93,8 +93,10 @@ dependencies {
     //noinspection GradleDynamicVersion
     implementation 'com.facebook.react:react-native:+'  // From node_modules
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    implementation 'com.braintreepayments.api:drop-in:4.6.0'
-    api 'com.karhoo:nsdk-canary:1.0.35.30092020-3'
+    implementation 'com.braintreepayments.api:drop-in:4.4.0'
+    implementation 'com.braintreepayments.api:braintree:3.14.2'
+    implementation 'com.braintreepayments.api:three-d-secure:3.14.2'
+    api 'com.karhoo:nsdk-canary:1.1.0.29102020-1'
 }
 
 def configureReactNativePom(def pom) {

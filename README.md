@@ -27,6 +27,19 @@ maven {
 }
 ```
 
+* add to AndroidManifest
+```
+<activity android:name="com.braintreepayments.api.BraintreeBrowserSwitchActivity"
+    android:launchMode="singleTask">
+    <intent-filter>
+        <action android:name="android.intent.action.VIEW" />
+        <category android:name="android.intent.category.DEFAULT" />
+        <category android:name="android.intent.category.BROWSABLE" />
+        <data android:scheme="${applicationId}.braintree" />
+    </intent-filter>
+</activity>
+```
+
 * link
 `$ react-native link react-native-react-native-karhoo-sdk`
 
