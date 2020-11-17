@@ -1,4 +1,4 @@
-package com.iteratorsmobile;
+package com.iteratorsmobile.lib.karhoo;
 
 import android.app.Activity;
 import android.content.Context;

@@ -1,4 +1,4 @@
-package com.iteratorsmobile;
+package com.iteratorsmobile.lib.karhoo;
 
 import java.util.Collections;
 import java.util.List;
