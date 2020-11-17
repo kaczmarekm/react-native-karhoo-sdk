@@ -27,7 +27,12 @@ maven {
 }
 ```
 
-* add to AndroidManifest
+* add to app level `build.gradle`:
+```
+implementation 'com.braintreepayments.api:drop-in:4.4.0'
+```
+
+* add to `AndroidManifest`
 ```
 <activity android:name="com.braintreepayments.api.BraintreeBrowserSwitchActivity"
     android:launchMode="singleTask">
@@ -58,6 +63,22 @@ KarhooSdk.initialize(
 ```javascript
 KarhooSdk.getPaymentNonce(
     organisationId: String,
-    currency: String
+    paymentData: {
+        currency: String;
+        amount: String;
+    },
+);
+```
+```javascript
+KarhooSdk.bookTrip(
+    {
+        firstName: String;
+        lastName: String;
+        email: String;
+        mobileNumber: String;
+        locale: String;
+    },
+    quoteId: String,
+    paymentNonce: String
 );
 ```
