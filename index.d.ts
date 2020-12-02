@@ -4,6 +4,7 @@ export interface GetPaymentNonceResponse {
 
 export interface BookTripResponse {
     tripId: string;
+    followCode: string;
 }
 
 export interface CancelTripResponse {

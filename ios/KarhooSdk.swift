@@ -99,7 +99,8 @@ class KarhooSdk: NSObject {
                     case .success(let trip):
                         print("KarhooSdk SUCCESS: \(trip)")
                         let resultDict: NSDictionary = [
-                            "tripId": trip,
+                            "tripId": trip.tripId,
+                            "folowCode": trip.folowCode
                         ]
                         resolve(resultDict)
                     case .failure(let error):

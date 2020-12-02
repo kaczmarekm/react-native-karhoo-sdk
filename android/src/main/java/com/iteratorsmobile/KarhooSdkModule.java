@@ -195,8 +195,10 @@ public class KarhooSdkModule extends ReactContextBaseJavaModule implements Activ
                         public Unit invoke(Resource<? extends TripInfo> resource) {
                             if (resource instanceof Resource.Success) {
                                 String tripId = ((Resource.Success<TripInfo>) resource).getData().getTripId();
+                                String followCode = ((Resource.Success<TripInfo>) resource).getData().getFollowCode();
                                 WritableMap response = Arguments.createMap();
                                 response.putString("tripId", tripId);
+                                response.putString("followCode", followCode);
                                 promise.resolve(response);
                             } else {
                                 promise.reject(BOOKING_FAILED, ((Resource.Failure) resource).getError().getUserFriendlyMessage());
