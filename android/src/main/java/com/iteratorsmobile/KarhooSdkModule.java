@@ -26,11 +26,13 @@ import com.karhoo.sdk.api.KarhooEnvironment;
 import com.karhoo.sdk.api.KarhooSDKConfiguration;
 import com.karhoo.sdk.api.model.AuthenticationMethod;
 import com.karhoo.sdk.api.model.BraintreeSDKToken;
+import com.karhoo.sdk.api.model.CancellationReason;
 import com.karhoo.sdk.api.model.TripInfo;
 import com.karhoo.sdk.api.network.request.PassengerDetails;
 import com.karhoo.sdk.api.network.request.Passengers;
 import com.karhoo.sdk.api.network.request.SDKInitRequest;
 import com.karhoo.sdk.api.network.request.TripBooking;
+import com.karhoo.sdk.api.network.request.TripCancellation;
 import com.karhoo.sdk.api.network.response.Resource;
 
 import org.jetbrains.annotations.NotNull;
@@ -49,6 +51,8 @@ public class KarhooSdkModule extends ReactContextBaseJavaModule implements Activ
     protected static final String EVENT_CANCELLED = "EVENT_CANCELLED";
     protected static final String EVENT_FAILED = "EVENT_FAILED";
     protected static final String BOOKING_FAILED = "BOOKING_FAILED";
+    protected static final String TRIP_CANCEL_FAILED = "TRIP_CANCEL_FAILED";
+
 
     private final ReactApplicationContext reactContext;
 
@@ -205,4 +209,29 @@ public class KarhooSdkModule extends ReactContextBaseJavaModule implements Activ
             promise.reject(BOOKING_FAILED, e);
         }
     }
+
+    @ReactMethod
+    public void cancelTrip(String tripId, final Promise promise) {
+        try {
+            TripCancellation tripCancellation = new TripCancellation(tripId, CancellationReason.OTHER_USER_REASON);
+            KarhooApi.INSTANCE.getTripService().cancel(tripCancellation).execute(
+                   new Function1<Resource<? extends Void>, Unit>() {
+                       @Override
+                       public Unit invoke(Resource<? extends Void> resource) {
+                           if (resource instanceof Resource.Success) {
+                               WritableMap response = Arguments.createMap();
+                               response.putBoolean("tripCancelled", true);
+                               promise.resolve(response);
+                           } else {
+                               promise.reject(TRIP_CANCEL_FAILED, ((Resource.Failure) resource).getError().getUserFriendlyMessage());
+                           }
+                           return Unit.INSTANCE;
+                       }
+                   }
+            );
+
+        } catch (Exception e) {
+            promise.reject(TRIP_CANCEL_FAILED, e);
+        }
+    } 
 }

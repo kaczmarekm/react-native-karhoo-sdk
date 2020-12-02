@@ -112,6 +112,30 @@ class KarhooSdk: NSObject {
                 }
             }
     }
+
+    @objc func cancelTrip(_ tripId: NSString, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) -> Void {
+        let tripCancellation = TripCancellation(tripId: tripId as String, cancelReason: .notNeededAnymore)
+        Karhoo
+            .getTripService()
+            .cancel(tripCancellation: tripCancellation)
+            .execute { result in
+                switch result {
+                    case .success:
+                        print("KarhooSdk SUCCESS: trip cancelled")
+                        let resultDict: NSDictionary = [
+                            "tripCancelled": true,
+                        ]
+                        resolve(resultDict)
+                    case .failure(let error):
+                        if let unwrappedError = error {
+                            print("KarhooSdk ERROR: \(unwrappedError.code) \(unwrappedError.message)")
+                        } else {
+                            print("KarhooSdk ERROR: Karhoo.getTripService().cancel() error")
+                        }
+                        reject("KarhooSdk ERROR", nil, error)
+                }
+            }
+    }
 }
 
 struct KarhooConfiguration: KarhooSDKConfiguration {
