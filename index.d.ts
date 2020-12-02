@@ -1,13 +1,13 @@
-export interface GetPaymentNonceResponse {
+export interface PaymentNonce {
     nonce: string;
 }
 
-export interface BookTripResponse {
+export interface TripInfo {
     tripId: string;
     followCode: string;
 }
 
-export interface CancelTripResponse {
+export interface TripCancelledInfo {
     tripCancelled: true;
 }
 
@@ -26,7 +26,7 @@ export interface Passenger {
 
 export default {
     initialize: (identifier: string, referer: string, organisationId: string): void => {},
-    getPaymentNonce: (organisationId: string, paymentData: PaymentData): Promise<GetPaymentNonceResponse | any> => {},
-    bookTrip: (passenger: Passenger, quoteId: string, paymentNonce: string): Promise<BookTripResponse | any> => {},
-    cancelTrip: (tripId: string): Promise<CancelTripResponse | any> => {}
+    getPaymentNonce: (organisationId: string, paymentData: PaymentData): Promise<PaymentNonce | any> => {},
+    bookTrip: (passenger: Passenger, quoteId: string, paymentNonce: string): Promise<TripInfo | any> => {},
+    cancelTrip: (tripId: string): Promise<TripCancelledInfo | any> => {}
 }

@@ -1,5 +1,5 @@
 import { NativeModules } from 'react-native';
-import { Passenger, GetPaymentNonceResponse, BookTripResponse, CancelTripResponse } from '.'
+import { Passenger, PaymentNonce, TripInfo, TripCancelledInfo } from '.'
 
 const { KarhooSdk } = NativeModules;
 
@@ -12,7 +12,7 @@ export default {
 
 export {
     Passenger,
-    GetPaymentNonceResponse,
-    BookTripResponse,
-    CancelTripResponse
+    PaymentNonce,
+    TripInfo,
+    TripCancelledInfo
 }
