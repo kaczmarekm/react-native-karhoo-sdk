@@ -100,7 +100,7 @@ class KarhooSdk: NSObject {
                         print("KarhooSdk SUCCESS: \(trip)")
                         let resultDict: NSDictionary = [
                             "tripId": trip.tripId,
-                            "folowCode": trip.followCode
+                            "followCode": trip.followCode
                         ]
                         resolve(resultDict)
                     case .failure(let error):
