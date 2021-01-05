@@ -4,8 +4,8 @@ import Braintree
 
 @objc(KarhooSdk)
 class KarhooSdk: NSObject {
-    @objc func initialize(_ identifier: String, referer: String, organisationId: String) -> Void {
-        Karhoo.set(configuration: KarhooConfiguration(identifier: identifier, referer: referer, organisationId: organisationId))
+    @objc func initialize(_ identifier: String, referer: String, organisationId: String, isProduction: Bool) -> Void {
+        Karhoo.set(configuration: KarhooConfiguration(identifier: identifier, referer: referer, organisationId: organisationId, isProduction: isProduction))
     }
 
     @objc func getPaymentNonce(_ organisationId: String, paymentData: NSDictionary, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) -> Void {
@@ -143,15 +143,17 @@ struct KarhooConfiguration: KarhooSDKConfiguration {
     var identifier: String
     var referer: String
     var organisationId: String
+    var isProduction: Bool
 
-    init (identifier: String, referer: String, organisationId: String) {
+    init (identifier: String, referer: String, organisationId: String, isProduction: Bool) {
         self.identifier = identifier
         self.referer = referer
         self.organisationId = organisationId
+        self.isProduction = isProduction
     }
 
     func environment() -> KarhooEnvironment {
-        return .sandbox
+        return self.isProduction ? .production : .sandbox
     }
 
     func authenticationMethod() -> AuthenticationMethod {

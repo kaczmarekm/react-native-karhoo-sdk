@@ -25,7 +25,7 @@ export interface Passenger {
 }
 
 export default {
-    initialize: (identifier: string, referer: string, organisationId: string): void => {},
+    initialize: (identifier: string, referer: string, organisationId: string, isProduction: boolean): void => {},
     getPaymentNonce: (organisationId: string, paymentData: PaymentData): Promise<PaymentNonce> => {},
     bookTrip: (passenger: Passenger, quoteId: string, paymentNonce: string): Promise<TripInfo> => {},
     cancelTrip: (tripId: string): Promise<TripCancelledInfo> => {}

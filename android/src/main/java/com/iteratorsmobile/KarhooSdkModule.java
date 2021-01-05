@@ -103,12 +103,12 @@ public class KarhooSdkModule extends ReactContextBaseJavaModule implements Activ
     public void onNewIntent(Intent intent) {}
 
     @ReactMethod
-    public void initialize(final String identifier, final String referer, final String organisationId) {
+    public void initialize(final String identifier, final String referer, final String organisationId, final boolean isProduction) {
         KarhooApi.INSTANCE.setConfiguration(new KarhooSDKConfiguration() {
             @NotNull
             @Override
             public KarhooEnvironment environment() {
-                return new KarhooEnvironment.Sandbox();
+                return isProduction ? new KarhooEnvironment.Production() : new KarhooEnvironment.Sandbox();
             }
 
             @NotNull

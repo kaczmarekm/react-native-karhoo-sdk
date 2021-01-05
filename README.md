@@ -57,7 +57,8 @@ import KarhooSdk from 'react-native-react-native-karhoo-sdk';
 KarhooSdk.initialize(
     identifier: String,
     referer: String,
-    organisationId: String
+    organisationId: String,
+    isProduction: Boolean
 );
 ```
 ```javascript
