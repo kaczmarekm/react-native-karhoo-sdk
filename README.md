@@ -2,14 +2,18 @@
 
 ## Getting started
 
-`$ npm install react-native-react-native-karhoo-sdk --save`
+`$ npm install @iteratorsmobile/react-native-react-native-karhoo-sdk --save`
+
+or 
+
+`$ yarn add @iteratorsmobile/react-native-react-native-karhoo-sdk`
 
 ### Installation
 
 * update Podfile
     * add
 `use_modular_headers!`
-    * update 
+    * update
 ```
     pod 'glog', :podspec => '../node_modules/react-native/third-party-podspecs/glog.podspec', :modular_headers => false
     pod 'Folly', :podspec => '../node_modules/react-native/third-party-podspecs/Folly.podspec', :modular_headers => false
@@ -59,7 +63,7 @@ KarhooSdk.initialize(
     referer: String,
     organisationId: String,
     isProduction: Boolean
-);
+): void;
 ```
 ```javascript
 KarhooSdk.getPaymentNonce(
@@ -68,7 +72,7 @@ KarhooSdk.getPaymentNonce(
         currency: String;
         amount: String;
     },
-);
+): Promise<PaymentNonce>;
 ```
 ```javascript
 KarhooSdk.bookTrip(
@@ -81,5 +85,10 @@ KarhooSdk.bookTrip(
     },
     quoteId: String,
     paymentNonce: String
-);
+): Promise<TripInfo>
+```
+```javascript
+KarhooSdk.cancelTrip(
+   tripId: String
+): Promise<TripCancelledInfo>;
 ```
