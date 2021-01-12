@@ -1,12 +1,12 @@
-# react-native-react-native-karhoo-sdk
+# react-native-karhoo-sdk
 
 ## Getting started
 
-`$ npm install @iteratorsmobile/react-native-react-native-karhoo-sdk --save`
+`$ npm install @iteratorsmobile/react-native--karhoo-sdk --save`
 
 or 
 
-`$ yarn add @iteratorsmobile/react-native-react-native-karhoo-sdk`
+`$ yarn add @iteratorsmobile/react-native-karhoo-sdk`
 
 ### Installation
 
@@ -50,12 +50,12 @@ implementation 'com.braintreepayments.api:drop-in:4.4.0'
 ```
 
 * link
-`$ react-native link react-native-react-native-karhoo-sdk`
+`$ react-native link @iteratorsmobile/react-native-karhoo-sdk`
 
 ## Usage
 
 ```javascript
-import KarhooSdk from 'react-native-react-native-karhoo-sdk';
+import KarhooSdk from '@iteratorsmobile/react-native-karhoo-sdk';
 ```
 ```javascript
 KarhooSdk.initialize(
