@@ -1,7 +1,7 @@
 {
   "name": "@iteratorsmobile/react-native-karhoo-sdk",
   "title": "React Native Karhoo Sdk",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "React-native bindings for KarhooSDK",
   "homepage": "https://github.com/iteratorsmobile/react-native-karhoo-sdk#README",
   "main": "index.js",
@@ -30,5 +30,12 @@
     "react": "^16.9.0",
     "react-native": "^0.61.5"
   },
+  "files": [
+    "android/",
+    "ios/",
+    "index.js",
+    "index.d.ts",
+    "react-native-karhoo-sdk.podspec"
+  ],
   "types": "./index.d.ts"
 }
