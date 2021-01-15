@@ -28,6 +28,7 @@ import com.karhoo.sdk.api.model.AuthenticationMethod;
 import com.karhoo.sdk.api.model.BraintreeSDKToken;
 import com.karhoo.sdk.api.model.CancellationReason;
 import com.karhoo.sdk.api.model.TripInfo;
+import com.karhoo.sdk.api.network.request.Luggage;
 import com.karhoo.sdk.api.network.request.PassengerDetails;
 import com.karhoo.sdk.api.network.request.Passengers;
 import com.karhoo.sdk.api.network.request.SDKInitRequest;
@@ -187,8 +188,9 @@ public class KarhooSdkModule extends ReactContextBaseJavaModule implements Activ
                     passenger.getString("mobileNumber"),
                     passenger.getString("locale")
             ));
-            Passengers passengers = new Passengers(0, passengersList);
-            TripBooking tripBooking = new TripBooking(quoteId, passengers, null, null, paymentNonce);
+            Luggage luggage = new Luggage(0);
+            Passengers passengers = new Passengers(0, passengersList, luggage);
+            TripBooking tripBooking = new TripBooking(null, null, null, null, passengers, null, paymentNonce, null, null, null, 0, quoteId);
             KarhooApi.INSTANCE.getTripService().book(tripBooking).execute(
                     new Function1<Resource<? extends TripInfo>, Unit>() {
                         @Override
@@ -215,7 +217,7 @@ public class KarhooSdkModule extends ReactContextBaseJavaModule implements Activ
     @ReactMethod
     public void cancelTrip(String tripId, final Promise promise) {
         try {
-            TripCancellation tripCancellation = new TripCancellation(tripId, CancellationReason.OTHER_USER_REASON);
+            TripCancellation tripCancellation = new TripCancellation(tripId, CancellationReason.OTHER_USER_REASON, "");
             KarhooApi.INSTANCE.getTripService().cancel(tripCancellation).execute(
                    new Function1<Resource<? extends Void>, Unit>() {
                        @Override

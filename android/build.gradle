@@ -94,7 +94,7 @@ dependencies {
     implementation 'com.facebook.react:react-native:+'  // From node_modules
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation 'com.braintreepayments.api:drop-in:4.4.0'
-    api 'com.karhoo:nsdk-canary:1.1.0.29102020-1'
+    api 'com.karhoo:nsdk-canary:1.1.1.210113-3'
 }
 
 def configureReactNativePom(def pom) {
