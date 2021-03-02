@@ -1,7 +1,7 @@
 {
   "name": "@iteratorsmobile/react-native-karhoo-sdk",
   "title": "React Native Karhoo Sdk",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "React-native bindings for KarhooSDK",
   "homepage": "https://github.com/iteratorsmobile/react-native-karhoo-sdk#README",
   "main": "index.js",
