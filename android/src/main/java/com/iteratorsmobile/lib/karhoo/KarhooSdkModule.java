@@ -25,6 +25,8 @@ import com.karhoo.sdk.api.KarhooApi;
 import com.karhoo.sdk.api.KarhooEnvironment;
 import com.karhoo.sdk.api.KarhooSDKConfiguration;
 import com.karhoo.sdk.api.model.AuthenticationMethod;
+import com.karhoo.sdk.api.model.BookingFee;
+import com.karhoo.sdk.api.model.BookingFeePrice;
 import com.karhoo.sdk.api.model.BraintreeSDKToken;
 import com.karhoo.sdk.api.model.CancellationReason;
 import com.karhoo.sdk.api.model.TripInfo;
@@ -35,6 +37,8 @@ import com.karhoo.sdk.api.network.request.SDKInitRequest;
 import com.karhoo.sdk.api.network.request.TripBooking;
 import com.karhoo.sdk.api.network.request.TripCancellation;
 import com.karhoo.sdk.api.network.response.Resource;
+import com.karhoo.sdk.api.service.trips.KarhooTripsService;
+import com.karhoo.sdk.api.service.trips.TripsService;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -53,6 +57,7 @@ public class KarhooSdkModule extends ReactContextBaseJavaModule implements Activ
     protected static final String EVENT_FAILED = "EVENT_FAILED";
     protected static final String BOOKING_FAILED = "BOOKING_FAILED";
     protected static final String TRIP_CANCEL_FAILED = "TRIP_CANCEL_FAILED";
+    protected static final String CANCELLATION_FEE_RETRIEVE_FAILED = "CANCELLATION_FEE_RETRIEVE_FAILED";
 
 
     private final ReactApplicationContext reactContext;
@@ -215,9 +220,45 @@ public class KarhooSdkModule extends ReactContextBaseJavaModule implements Activ
     }
 
     @ReactMethod
-    public void cancelTrip(String tripId, final Promise promise) {
+    public void cancellationFee(String tripId, final Promise promise) {
         try {
-            TripCancellation tripCancellation = new TripCancellation(tripId, CancellationReason.OTHER_USER_REASON, "");
+            KarhooApi.INSTANCE.getTripService().cancellationFee(tripId).execute(
+                    new Function1<Resource<? extends BookingFee>, Unit>() {
+                        @Override
+                        public Unit invoke(Resource<? extends BookingFee> resource) {
+                            if (resource instanceof Resource.Success) {
+                                boolean cancellationFee = ((Resource.Success<BookingFee>) resource).getData().getCancellationFee();
+                                BookingFeePrice bookingFeePrice = ((Resource.Success<BookingFee>) resource).getData().getFee();
+
+                                WritableMap response = Arguments.createMap();
+                                response.putBoolean("cancellationFee", cancellationFee);
+
+                                if (bookingFeePrice != null) {
+                                    WritableMap bookingFeePriceMap = Arguments.createMap();
+                                    bookingFeePriceMap.putString("currency", bookingFeePrice.getCurrency());
+                                    bookingFeePriceMap.putString("type", bookingFeePrice.getType());
+                                    bookingFeePriceMap.putDouble("value", bookingFeePrice.getValue());
+
+                                    response.putMap("fee", bookingFeePriceMap);
+                                }
+
+                                promise.resolve(response);
+                            } else {
+                                promise.reject(CANCELLATION_FEE_RETRIEVE_FAILED, ((Resource.Failure) resource).getError().getUserFriendlyMessage());
+                            }
+                            return Unit.INSTANCE;
+                        }
+                    }
+            );
+        } catch (Exception e) {
+            promise.reject(CANCELLATION_FEE_RETRIEVE_FAILED, e);
+        }
+    }
+
+    @ReactMethod
+    public void cancelTrip(String followCode, final Promise promise) {
+        try {
+            TripCancellation tripCancellation = new TripCancellation(followCode, CancellationReason.OTHER_USER_REASON, "");
             KarhooApi.INSTANCE.getTripService().cancel(tripCancellation).execute(
                    new Function1<Resource<? extends Void>, Unit>() {
                        @Override
@@ -233,7 +274,6 @@ public class KarhooSdkModule extends ReactContextBaseJavaModule implements Activ
                        }
                    }
             );
-
         } catch (Exception e) {
             promise.reject(TRIP_CANCEL_FAILED, e);
         }

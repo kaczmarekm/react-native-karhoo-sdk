@@ -1,32 +1,44 @@
-export interface PaymentNonce {
-    nonce: string;
+declare namespace KarhooSdk {
+    interface PaymentNonce {
+        nonce: string;
+    }
+
+    interface TripInfo {
+        tripId: string;
+        followCode: string;
+    }
+
+    interface CancellationFeeInfo {
+        cancellationFee: boolean;
+        fee?: {
+            currency: string;
+            type: string;
+            value: number;
+        };
+    }
+
+    interface TripCancelledInfo {
+        tripCancelled: true;
+    }
+
+    interface PaymentData {
+        currency: string;
+        amount: string;
+    }
+
+    interface Passenger {
+        firstName: string;
+        lastName: string;
+        email: string;
+        mobileNumber: string;
+        locale: string;
+    }
+    
+    const initialize: (identifier: string, referer: string, organisationId: string, isProduction: boolean) => void
+    const getPaymentNonce: (organisationId: string, paymentData: PaymentData) => Promise<PaymentNonce>
+    const bookTrip: (passenger: Passenger, quoteId: string, paymentNonce: string) => Promise<TripInfo>
+    const cancellationFee: (tripId: string) => Promise<CancellationFeeInfo>
+    const cancelTrip: (followCode: string) => Promise<TripCancelledInfo>
 }
 
-export interface TripInfo {
-    tripId: string;
-    followCode: string;
-}
-
-export interface TripCancelledInfo {
-    tripCancelled: true;
-}
-
-export interface PaymentData {
-    currency: string;
-    amount: string;
-}
-
-export interface Passenger {
-    firstName: string;
-    lastName: string;
-    email: string;
-    mobileNumber: string;
-    locale: string;
-}
-
-export default {
-    initialize: (identifier: string, referer: string, organisationId: string, isProduction: boolean): void => {},
-    getPaymentNonce: (organisationId: string, paymentData: PaymentData): Promise<PaymentNonce> => {},
-    bookTrip: (passenger: Passenger, quoteId: string, paymentNonce: string): Promise<TripInfo> => {},
-    cancelTrip: (tripId: string): Promise<TripCancelledInfo> => {}
-}
+export = KarhooSdk
