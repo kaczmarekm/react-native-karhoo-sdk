@@ -6,6 +6,6 @@ export default {
     initialize: (identifier, referer, organisationId, isProduction) => KarhooSdk.initialize(identifier, referer, organisationId, isProduction),
     getPaymentNonce: (organisationId, paymentData) => KarhooSdk.getPaymentNonce(organisationId, paymentData),
     bookTrip: (passenger, quoteId, paymentNonce) => KarhooSdk.bookTrip(passenger, quoteId, paymentNonce),
-    cancellationFee: (tripId) => KarhooSdk.cancellationFee(tripId),
+    cancellationFee: (followCode) => KarhooSdk.cancellationFee(followCode),
     cancelTrip: (followCode) => KarhooSdk.cancelTrip(followCode)
 };

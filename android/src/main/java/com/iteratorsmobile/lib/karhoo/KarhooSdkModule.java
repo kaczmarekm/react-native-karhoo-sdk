@@ -220,9 +220,9 @@ public class KarhooSdkModule extends ReactContextBaseJavaModule implements Activ
     }
 
     @ReactMethod
-    public void cancellationFee(String tripId, final Promise promise) {
+    public void cancellationFee(String followCode, final Promise promise) {
         try {
-            KarhooApi.INSTANCE.getTripService().cancellationFee(tripId).execute(
+            KarhooApi.INSTANCE.getTripService().cancellationFee(followCode).execute(
                     new Function1<Resource<? extends BookingFee>, Unit>() {
                         @Override
                         public Unit invoke(Resource<? extends BookingFee> resource) {

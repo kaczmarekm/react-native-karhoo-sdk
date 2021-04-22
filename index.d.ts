@@ -37,7 +37,7 @@ declare namespace KarhooSdk {
     const initialize: (identifier: string, referer: string, organisationId: string, isProduction: boolean) => void
     const getPaymentNonce: (organisationId: string, paymentData: PaymentData) => Promise<PaymentNonce>
     const bookTrip: (passenger: Passenger, quoteId: string, paymentNonce: string) => Promise<TripInfo>
-    const cancellationFee: (tripId: string) => Promise<CancellationFeeInfo>
+    const cancellationFee: (followCode: string) => Promise<CancellationFeeInfo>
     const cancelTrip: (followCode: string) => Promise<TripCancelledInfo>
 }
 

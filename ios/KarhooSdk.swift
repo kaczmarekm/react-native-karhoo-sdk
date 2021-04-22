@@ -114,10 +114,10 @@ class KarhooSdk: NSObject {
             }
     }
 
-    @objc func cancellationFee(_ tripId: NSString, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) -> Void {
+    @objc func cancellationFee(_ followCode: NSString, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) -> Void {
         Karhoo
             .getTripService()
-            .cancellationFee(identifier: tripId as String)
+            .cancellationFee(identifier: followCode as String)
             .execute { result in
                 switch result {
                     case .success(let bookingFee):
@@ -130,16 +130,7 @@ class KarhooSdk: NSObject {
                                 "value": bookingFee.fee.value,
                            ]
                        ]
-                       resolve(resultDict)  
-//                        if bookingFee.fee != nil {
-//
-//                        } else {
-//                            let resultDict: NSDictionary = [
-//                               "cancellationFee": bookingFee.cancellationFee
-//                           ]
-//                           resolve(resultDict)
-//                        }
-//
+                       resolve(resultDict)
                     case .failure(let error):
                         if let unwrappedError = error {
                             print("KarhooSdk ERROR: \(unwrappedError.code) \(unwrappedError.message)")
