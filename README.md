@@ -21,7 +21,7 @@ or
 
 * add to project level `build.gradle`:
 ```
-maven { url 'https://flit-tech.bintray.com/Android' }`
+maven { url 'https://jitpack.io' }
 maven {
     url "https://cardinalcommerce.bintray.com/android"
     credentials {
