@@ -95,11 +95,11 @@ KarhooSdk.bookTrip(
 ): Promise<TripInfo>
 ```
 #### 3.5 Get cancellation fee data... 
-* this step is not required, but user should be acquainted with cancellation fee amount before he cancel ride
+* this step is not required, but user should be acquainted with cancellation fee amount before he cancels ride
 ```javascript
-KarhooSdk.cancellationFee(tripId): Promise<CancellationFeeInfo>;
+KarhooSdk.cancellationFee(followCode): Promise<CancellationFeeInfo>;
 ```
 #### 3.6 ...before you cancel trip
 ```javascript
-KarhooSdk.cancelTrip(tripId): Promise<TripCancelledInfo>;
+KarhooSdk.cancelTrip(followCode): Promise<TripCancelledInfo>;
 ```
