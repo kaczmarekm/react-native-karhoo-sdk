@@ -114,8 +114,36 @@ class KarhooSdk: NSObject {
             }
     }
 
-    @objc func cancelTrip(_ tripId: NSString, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) -> Void {
-        let tripCancellation = TripCancellation(tripId: tripId as String, cancelReason: .notNeededAnymore)
+    @objc func cancellationFee(_ followCode: NSString, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) -> Void {
+        Karhoo
+            .getTripService()
+            .cancellationFee(identifier: followCode as String)
+            .execute { result in
+                switch result {
+                    case .success(let bookingFee):
+                        print("KarhooSdk SUCCESS: \(bookingFee)")
+                        let resultDict: NSDictionary = [
+                           "cancellationFee": bookingFee.cancellationFee,
+                           "fee":  [
+                                "currency": bookingFee.fee.currency,
+                                "type": bookingFee.fee.value,
+                                "value": bookingFee.fee.value,
+                           ]
+                       ]
+                       resolve(resultDict)
+                    case .failure(let error):
+                        if let unwrappedError = error {
+                            print("KarhooSdk ERROR: \(unwrappedError.code) \(unwrappedError.message)")
+                        } else {
+                            print("KarhooSdk ERROR: Karhoo.getTripService().cancellationFee() error")
+                        }
+                        reject("KarhooSdk ERROR", nil, error)
+                }
+            }
+    }
+
+    @objc func cancelTrip(_ followCode: NSString, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) -> Void {
+        let tripCancellation = TripCancellation(tripId: followCode as String, cancelReason: .notNeededAnymore)
         Karhoo
             .getTripService()
             .cancel(tripCancellation: tripCancellation)
