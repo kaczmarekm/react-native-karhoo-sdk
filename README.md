@@ -51,7 +51,55 @@ implementation 'com.braintreepayments.api:drop-in:4.4.0'
 </activity>
 ```
 
-#### 2.5. Link
+#### 2.5 Follow Braintree docs
+
+1. Add to Podfile
+```
+    pod 'Braintree'
+```
+
+2. Update to AppDelegate.m
+```
+    // imports
+    @import Braintree;
+```
+```
+- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {  
+    
+    // other code
+    
+    [BTAppSwitch setReturnURLScheme:[NSString stringWithFormat:@"%@%@", [[NSBundle mainBundle] bundleIdentifier], @".payments"]];
+    
+    return YES;
+}
+```
+```
+- (BOOL)application:(UIApplication *)app openURL:(NSURL *)url options:(NSDictionary<UIApplicationOpenURLOptionsKey,id> *)options {
+  BOOL handled = NO;
+  
+  if ([url.scheme localizedCaseInsensitiveCompare:([NSString stringWithFormat:@"%@%@", [[NSBundle mainBundle] bundleIdentifier], @".payments"])] == NSOrderedSame) {
+    handled = [BTAppSwitch handleOpenURL:url options:options];
+  }
+  
+  /* 
+    NOTE: if you are using RCTLinkingManager it has to be placed in last 'if', for example :
+    
+    else if ([RCTLinkingManager application:app openURL:url options:options]) {
+    handled = YES;
+  }
+*/
+  return handled;
+}
+```
+
+3. Register URL Type:
+3.1 For each target in your app, in XCode go to App Target > Info > URL Types
+3.2 Click '+', add URL `${bundleId}.payments`, where `${bundleId}` is your app bundle id
+
+4. Add required permission:
+* `NSLocationWhenInUseUsageDescription`
+
+#### 2.6. Link
 ```
 $ react-native link @iteratorsmobile/react-native-karhoo-sdk
 ```
