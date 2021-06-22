@@ -58,7 +58,7 @@ implementation 'com.braintreepayments.api:drop-in:4.4.0'
     pod 'Braintree'
 ```
 
-2. Update to AppDelegate.m
+2. Update AppDelegate.m
 ```
     // imports
     @import Braintree;
