@@ -25,17 +25,17 @@ pod 'Folly', :podspec => '../node_modules/react-native/third-party-podspecs/Foll
 ```
 maven { url 'https://jitpack.io' }
 maven {
-    url "https://cardinalcommerce.bintray.com/android"
+    url "https://cardinalcommerceprod.jfrog.io/artifactory/android"
     credentials {
-        username 'braintree-team-sdk@cardinalcommerce'
-        password '220cc9476025679c4e5c843666c27d97cfb0f951'
+        username 'braintree_team_sdk'
+        password 'AKCp8jQcoDy2hxSWhDAUQKXLDPDx6NYRkqrgFLRc3qDrayg6rrCbJpsKKyMwaykVL8FWusJpp'
     }
 }
 ```
 
 #### 2.3. Update app level `build.gradle`:
 ```
-implementation 'com.braintreepayments.api:drop-in:4.4.0'
+implementation 'com.braintreepayments.api:drop-in:5.+'
 ```
 
 #### 2.4. Update `AndroidManifest`

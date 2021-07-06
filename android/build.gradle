@@ -80,10 +80,10 @@ repositories {
     jcenter()
     maven { url 'https://jitpack.io' }
     maven {
-        url "https://cardinalcommerce.bintray.com/android"
+        url "https://cardinalcommerceprod.jfrog.io/artifactory/android"
         credentials {
-            username 'braintree-team-sdk@cardinalcommerce'
-            password '220cc9476025679c4e5c843666c27d97cfb0f951'
+            username 'braintree_team_sdk'
+            password 'AKCp8jQcoDy2hxSWhDAUQKXLDPDx6NYRkqrgFLRc3qDrayg6rrCbJpsKKyMwaykVL8FWusJpp'
         }
     }
 }
@@ -93,8 +93,8 @@ dependencies {
     //noinspection GradleDynamicVersion
     implementation 'com.facebook.react:react-native:+'  // From node_modules
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    implementation 'com.braintreepayments.api:drop-in:4.4.0'
-    api 'com.github.karhoo:karhoo-android-sdk:1.2.2.25032021-1'
+    implementation 'com.braintreepayments.api:drop-in:5.+'
+    implementation 'com.github.karhoo:karhoo-android-sdk:1.4.0'
 }
 
 def configureReactNativePom(def pom) {
