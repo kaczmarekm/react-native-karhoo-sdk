@@ -1,7 +1,7 @@
 {
   "name": "@iteratorsmobile/react-native-karhoo-sdk",
   "title": "React Native Karhoo Sdk",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "React-native bindings for KarhooSDK",
   "homepage": "https://github.com/iteratorsmobile/react-native-karhoo-sdk#README",
   "main": "index.js",
@@ -16,19 +16,18 @@
   "keywords": [
     "react-native",
     "karhoo",
-    "braintree",
-    "braintreeDropin"
+    "karhooSdk"
   ],
   "author": "Mateusz Kaczmarek",
   "license": "MIT",
   "readmeFilename": "README.md",
   "peerDependencies": {
-    "react": "^16.8.1",
-    "react-native": ">=0.60.0-rc.0 <1.0.x"
+    "react": "*",
+    "react-native": "*"
   },
   "devDependencies": {
-    "react": "^16.9.0",
-    "react-native": "^0.61.5"
+    "react": "^18.1.0",
+    "react-native": "^0.70.4"
   },
   "files": [
     "android/",

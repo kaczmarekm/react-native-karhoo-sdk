@@ -1,6 +1,5 @@
 import KarhooSDK
 import BraintreeDropIn
-import Braintree
 
 @objc(KarhooSdk)
 class KarhooSdk: NSObject {
@@ -14,13 +13,16 @@ class KarhooSdk: NSObject {
             .initialisePaymentSDK(paymentSDKTokenPayload: PaymentSDKTokenPayload(organisationId: organisationId, currency: paymentData["currency"] as! String))
             .execute { result in
                 switch result {
-                    case .success(let sdk):
+                    case .success(let result, let correlationId):
                         let amountString = paymentData["amount"] as! String
                         let amountDecimal = Decimal(string: amountString)
                         
                         if (amountDecimal == nil) {
-                            print("KarhooSdk ERROR: amount not formatted correctly")
-                            reject("KarhooSdk ERROR", "amount not formatted correctly", nil)
+                            let errorDict: NSDictionary = [
+                                "correlationId": correlationId!
+                            ]
+                            print("KarhooSdk ERROR: amount not formatted correctly \(errorDict)")
+                            reject("KarhooSdk ERROR", "amount not formatted correctly", errorDict as? Error)
                             return;
                         }
                         
@@ -30,43 +32,43 @@ class KarhooSdk: NSObject {
                         threeDSecureRequest.amount = amountNSDecimalNumber
                         threeDSecureRequest.versionRequested = .version2
                         
-                        let dropInRequest =  BTDropInRequest()
-                        dropInRequest.threeDSecureVerification = true
+                        let dropInRequest = BTDropInRequest()
                         dropInRequest.threeDSecureRequest = threeDSecureRequest
                         
-                        let dropIn = BTDropInController(authorization: sdk.token, request: dropInRequest) {
+                        let dropIn = BTDropInController(authorization: result.token, request: dropInRequest) {
                             (controller, result, error) in
+                                let errorDict: NSDictionary = [
+                                    "error": error!,
+                                    "correlationId": correlationId!
+                                ]
                                 if (error != nil) {
-                                    if let unwrappedError = error {
-                                        print("KarhooSdk ERROR: \(unwrappedError)")
-                                    } else {
-                                        print("KarhooSdk ERROR: BTDropInController error")
-                                    }
                                     controller.dismiss(animated: true, completion: nil)
-                                    reject("KarhooSdk ERROR", nil, error)
-                                } else if (result?.isCancelled == true) {
-                                    print("KarhooSdk CANCELLED")
+                                    print("KarhooSdk ERROR getPaymentNonce FAILURE: \(errorDict)")
+                                    reject("KarhooSdk ERROR", "getPaymentNonce", errorDict as? Error)
+                                } else if (result?.isCanceled == true) {
                                     controller.dismiss(animated: true, completion: nil)
-                                    reject("KarhooSdk ERROR", "CANCELLED", nil)
+                                    print("KarhooSdk ERROR getPaymentNonce CANCELLED: \(errorDict)")
+                                    reject("KarhooSdk ERROR", "getPaymentNonce CANCELLED", errorDict as? Error)
                                 } else if let result = result {
-                                    print("KarhooSdk SUCCESS")
                                     let nonce = result.paymentMethod?.nonce
                                     let resultDict: NSDictionary = [
                                         "nonce": nonce!,
+                                        "correlationId": correlationId!
                                     ]
                                     controller.dismiss(animated: true, completion: nil)
+                                    print("KarhooSdk getPaymentNonce SUCCESS")
                                     resolve(resultDict)
                                 }
                         }
                         let rootViewController = UIApplication.shared.delegate?.window??.rootViewController
                         rootViewController?.present(dropIn!, animated: true, completion: nil)
-                    case .failure(let error):
-                        if let unwrappedError = error {
-                            print("KarhooSdk ERROR: \(unwrappedError.code) \(unwrappedError.message)")
-                        } else {
-                            print("KarhooSdk ERROR: Karhoo.getPaymentService().initialisePaymentSDK() error")
-                        }
-                        reject("KarhooSdk ERROR", nil, error)
+                    case .failure(let error, let correlationId):
+                        let errorDict: NSDictionary = [
+                            "error": error!,
+                            "correlationId": correlationId!
+                        ]
+                        print("KarhooSdk ERROR getPaymentNonce FAILURE: \(errorDict)")
+                        reject("KarhooSdk ERROR", "getPaymentNonce", errorDict as? Error)
                 }
             }
     }
@@ -96,20 +98,21 @@ class KarhooSdk: NSObject {
             .book(tripBooking: tripBooking)
             .execute { result in
                 switch result {
-                    case .success(let trip):
-                        print("KarhooSdk SUCCESS: \(trip)")
+                    case .success(let trip, let correlationId):
                         let resultDict: NSDictionary = [
                             "tripId": trip.tripId,
-                            "followCode": trip.followCode
+                            "followCode": trip.followCode,
+                            "correlationId": correlationId!,
                         ]
+                        print("KarhooSdk SUCCESS: \(resultDict)")
                         resolve(resultDict)
-                    case .failure(let error):
-                        if let unwrappedError = error {
-                            print("KarhooSdk ERROR: \(unwrappedError.code) \(unwrappedError.message)")
-                        } else {
-                            print("KarhooSdk ERROR: Karhoo.getTripService().book() error")
-                        }
-                        reject("KarhooSdk ERROR", nil, error)
+                    case .failure(let error, let correlationId):
+                        let errorDict: NSDictionary = [
+                            "error": error!,
+                            "correlationId": correlationId!
+                        ]
+                        print("KarhooSdk ERROR bookTrip FAILURE: \(errorDict)")
+                        reject("KarhooSdk ERROR", "bookTrip", errorDict as? Error)
                 }
             }
     }
@@ -120,24 +123,25 @@ class KarhooSdk: NSObject {
             .cancellationFee(identifier: followCode as String)
             .execute { result in
                 switch result {
-                    case .success(let bookingFee):
-                        print("KarhooSdk SUCCESS: \(bookingFee)")
+                    case .success(let bookingFee, let correlationId):
                         let resultDict: NSDictionary = [
-                           "cancellationFee": bookingFee.cancellationFee,
-                           "fee":  [
+                            "cancellationFee": bookingFee.cancellationFee,
+                            "fee":  [
                                 "currency": bookingFee.fee.currency,
                                 "type": bookingFee.fee.value,
                                 "value": bookingFee.fee.value,
-                           ]
-                       ]
-                       resolve(resultDict)
-                    case .failure(let error):
-                        if let unwrappedError = error {
-                            print("KarhooSdk ERROR: \(unwrappedError.code) \(unwrappedError.message)")
-                        } else {
-                            print("KarhooSdk ERROR: Karhoo.getTripService().cancellationFee() error")
-                        }
-                        reject("KarhooSdk ERROR", nil, error)
+                            ],
+                            "correlationId": correlationId!
+                        ]
+                        print("KarhooSdk SUCCESS: \(bookingFee)")
+                        resolve(resultDict)
+                    case .failure(let error, let correlationId):
+                        let errorDict: NSDictionary = [
+                            "error": error!,
+                            "correlationId": correlationId!
+                        ]
+                        print("KarhooSdk ERROR cancellationFee FAILURE: \(errorDict)")
+                        reject("KarhooSdk ERROR", "cancellationFee", errorDict as? Error)
                 }
             }
     }
@@ -149,19 +153,20 @@ class KarhooSdk: NSObject {
             .cancel(tripCancellation: tripCancellation)
             .execute { result in
                 switch result {
-                    case .success:
-                        print("KarhooSdk SUCCESS: trip cancelled")
+                    case .success(_, let correlationId):
                         let resultDict: NSDictionary = [
                             "tripCancelled": true,
+                            "correlationId": correlationId!
                         ]
+                        print("KarhooSdk SUCCESS: trip cancelled: \(resultDict)")
                         resolve(resultDict)
-                    case .failure(let error):
-                        if let unwrappedError = error {
-                            print("KarhooSdk ERROR: \(unwrappedError.code) \(unwrappedError.message)")
-                        } else {
-                            print("KarhooSdk ERROR: Karhoo.getTripService().cancel() error")
-                        }
-                        reject("KarhooSdk ERROR", nil, error)
+                    case .failure(let error, let correlationId):
+                        let errorDict: NSDictionary = [
+                            "error": error!,
+                            "correlationId": correlationId!
+                        ]
+                        print("KarhooSdk ERROR cancelTrip FAILURE: \(errorDict)")
+                        reject("KarhooSdk ERROR", "cancelTrip", errorDict as? Error)
                 }
             }
     }

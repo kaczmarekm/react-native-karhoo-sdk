@@ -1,11 +1,21 @@
-import { NativeModules } from 'react-native';
+import { NativeModules } from "react-native";
 
-const { KarhooSdk } = NativeModules;
+const { KarhooSdk: KarhooSdkNative } = NativeModules;
 
-export default {
-    initialize: (identifier, referer, organisationId, isProduction) => KarhooSdk.initialize(identifier, referer, organisationId, isProduction),
-    getPaymentNonce: (organisationId, paymentData) => KarhooSdk.getPaymentNonce(organisationId, paymentData),
-    bookTrip: (passenger, quoteId, paymentNonce) => KarhooSdk.bookTrip(passenger, quoteId, paymentNonce),
-    cancellationFee: (followCode) => KarhooSdk.cancellationFee(followCode),
-    cancelTrip: (followCode) => KarhooSdk.cancelTrip(followCode)
+const KarhooSdk = {
+  initialize: (identifier, referer, organisationId, isProduction) =>
+    KarhooSdkNative.initialize(
+      identifier,
+      referer,
+      organisationId,
+      isProduction
+    ),
+  getPaymentNonce: (organisationId, paymentData) =>
+    KarhooSdkNative.getPaymentNonce(organisationId, paymentData),
+  bookTrip: (passenger, quoteId, paymentNonce) =>
+    KarhooSdkNative.bookTrip(passenger, quoteId, paymentNonce),
+  cancellationFee: (followCode) => KarhooSdkNative.cancellationFee(followCode),
+  cancelTrip: (followCode) => KarhooSdkNative.cancelTrip(followCode),
 };
+
+export default KarhooSdk;

@@ -1,27 +1,17 @@
-# react-native-karhoo-sdk
+# react-native-karhoo-sdk v1.2.0
 
 ## 1. Getting started
 
-`$ npm install @iteratorsmobile/react-native--karhoo-sdk --save`
-
-or 
-
+`$ npm install @iteratorsmobile/react-native-karhoo-sdk --save`
+or
 `$ yarn add @iteratorsmobile/react-native-karhoo-sdk`
 
-## 2. Installation
+## 2 Follow Braintree docs
 
-#### 2.1. Update Podfile
-add 
-```
-use_modular_headers!
-```
-update
-```
-pod 'glog', :podspec => '../node_modules/react-native/third-party-podspecs/glog.podspec', :modular_headers => false
-pod 'Folly', :podspec => '../node_modules/react-native/third-party-podspecs/Folly.podspec', :modular_headers => false
-````
+### 2.1. Android
 
-#### 2.2. Update project level `build.gradle`:
+#### 2.1.1. Update project level `build.gradle`:
+
 ```
 maven { url 'https://jitpack.io' }
 maven {
@@ -33,12 +23,14 @@ maven {
 }
 ```
 
-#### 2.3. Update app level `build.gradle`:
+#### 2.1.2. Update app level `build.gradle`:
+
 ```
 implementation 'com.braintreepayments.api:drop-in:5.+'
 ```
 
-#### 2.4. Update `AndroidManifest`
+#### 2.1.3. Update `AndroidManifest`
+
 ```
 <activity android:name="com.braintreepayments.api.BraintreeBrowserSwitchActivity"
     android:launchMode="singleTask">
@@ -51,65 +43,84 @@ implementation 'com.braintreepayments.api:drop-in:5.+'
 </activity>
 ```
 
-#### 2.5 Follow Braintree docs
+### 2.2. iOS
 
-1. Add to Podfile
+#### 2.2.1. Update `Podfile`
+
 ```
-    pod 'Braintree'
+pod 'Braintree'
+pod 'BraintreeDropIn', :modular_headers => true
 ```
 
-2. Update AppDelegate.m
+#### 2.2.2. Update `AppDelegate.mm`
+
 ```
-    // imports
-    @import Braintree;
+// imports
+#import "BraintreeCore.h"
 ```
+
 ```
-- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {  
-    
-    // other code
-    
-    [BTAppSwitch setReturnURLScheme:[NSString stringWithFormat:@"%@%@", [[NSBundle mainBundle] bundleIdentifier], @".payments"]];
-    
+- (NSString *)paymentsURLScheme {
+    NSString *bundleIdentifier = [[NSBundle mainBundle] bundleIdentifier];
+    return [NSString stringWithFormat:@"%@.%@", bundleIdentifier, @"payments"];
+}
+```
+
+```
+- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+
+    /*
+        ...other code
+        add ...
+    */
+    [BTAppContextSwitcher setReturnURLScheme:self.paymentsURLScheme];
+
     return YES;
 }
 ```
+
 ```
 - (BOOL)application:(UIApplication *)app openURL:(NSURL *)url options:(NSDictionary<UIApplicationOpenURLOptionsKey,id> *)options {
-  BOOL handled = NO;
-  
-  if ([url.scheme localizedCaseInsensitiveCompare:([NSString stringWithFormat:@"%@%@", [[NSBundle mainBundle] bundleIdentifier], @".payments"])] == NSOrderedSame) {
-    handled = [BTAppSwitch handleOpenURL:url options:options];
-  }
-  
-  /* 
-    NOTE: if you are using RCTLinkingManager it has to be placed in last 'if', for example :
-    
-    else if ([RCTLinkingManager application:app openURL:url options:options]) {
-    handled = YES;
-  }
-*/
-  return handled;
+    BOOL handled = NO;
+
+    if ([url.scheme localizedCaseInsensitiveCompare:([NSString stringWithFormat:@"%@%@", self.paymentsURLScheme)] == NSOrderedSame) {
+        handled = [BTAppContextSwitcher handleOpenURL:url];
+    }
+
+    return handled;
 }
 ```
 
-3. Register URL Type:
+NOTE:
+if you are using RCTLinkingManager it has to be placed in last if statement, eg:
+
+```
+if ([url.scheme localizedCaseInsensitiveCompare:([NSString stringWithFormat:@"%@%@", self.paymentsURLScheme)] == NSOrderedSame) {
+    handled = [BTAppContextSwitcher handleOpenURL:url];
+} else if ([RCTLinkingManager application:app openURL:url options:options]) {
+    handled = YES;
+}
+```
+
+##### 2.2.3. Register URL Type:
+
 3.1 For each target in your app, in XCode go to App Target > Info > URL Types
 3.2 Click '+', add URL `${bundleId}.payments`, where `${bundleId}` is your app bundle id
 
-4. Add required permission:
-* `NSLocationWhenInUseUsageDescription`
+##### 2.2.4. Add required permission:
 
-#### 2.6. Link
-```
-$ react-native link @iteratorsmobile/react-native-karhoo-sdk
-```
+- `NSLocationWhenInUseUsageDescription`
 
 ## 3. Usage
-#### 3.1 Import
+
+### 3.1. Import
+
 ```javascript
-import KarhooSdk from '@iteratorsmobile/react-native-karhoo-sdk';
+import KarhooSdk from "@iteratorsmobile/react-native-karhoo-sdk";
 ```
-#### 3.2 Before using other features you have to initialize sdk:
+
+### 3.2. Before using other features you have to initialize sdk:
+
 ```javascript
 KarhooSdk.initialize(
     identifie,
@@ -118,7 +129,9 @@ KarhooSdk.initialize(
     isProduction,
 ): void;
 ```
-#### 3.3 Obtain payment nonce..
+
+### 3.3. Obtain payment nonce..
+
 ```javascript
 KarhooSdk.getPaymentNonce(
     organisationId,
@@ -128,7 +141,9 @@ KarhooSdk.getPaymentNonce(
     },
 ): Promise<PaymentNonce>;
 ```
-#### 3.4 ...and pass along with other booking data t book a ride
+
+### 3.4. ...and pass along with other booking data t book a ride
+
 ```javascript
 KarhooSdk.bookTrip(
     {
@@ -142,12 +157,27 @@ KarhooSdk.bookTrip(
     paymentNonce,
 ): Promise<TripInfo>
 ```
-#### 3.5 Get cancellation fee data... 
-* this step is not required, but user should be acquainted with cancellation fee amount before he cancels ride
+
+### 3.5. Get cancellation fee data...
+
+- this step is not required, but user should be acquainted with cancellation fee amount before he cancels ride
+
 ```javascript
 KarhooSdk.cancellationFee(followCode): Promise<CancellationFeeInfo>;
 ```
-#### 3.6 ...before you cancel trip
+
+### 3.6. ...before you cancel trip
+
 ```javascript
 KarhooSdk.cancelTrip(followCode): Promise<TripCancelledInfo>;
 ```
+
+## 4. Running example project
+
+### 4.1. Install dependencies
+
+`$ yarn && cd example && yarn && cd ios && pod install && cd .. && clear`
+
+### 4.2. Run
+
+Start 'example' project just as a normal react-native project.

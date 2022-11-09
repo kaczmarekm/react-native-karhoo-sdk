@@ -7,4 +7,3 @@
     RCT_EXTERN_METHOD(cancellationFee:(NSString *)followCode resolve:(RCTPromiseResolveBlock *)resolve reject:(RCTPromiseRejectBlock *)reject)
     RCT_EXTERN_METHOD(cancelTrip:(NSString *)followCode resolve:(RCTPromiseResolveBlock *)resolve reject:(RCTPromiseRejectBlock *)reject)
 @end
-
