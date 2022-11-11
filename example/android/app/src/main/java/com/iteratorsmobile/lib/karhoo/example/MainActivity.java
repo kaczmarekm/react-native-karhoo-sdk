@@ -1,4 +1,4 @@
-package com.example;
+package com.iteratorsmobile.lib.karhoo.example;
 
 import android.os.Bundle;
 import com.facebook.react.ReactActivity;

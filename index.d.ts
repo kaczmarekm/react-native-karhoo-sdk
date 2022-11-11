@@ -21,7 +21,7 @@ declare namespace KarhooSdk {
     };
   }
 
-  interface TripCancelledInfo extends CorrelationId {
+  interface CancelledTripInfo extends CorrelationId {
     tripCancelled: true;
   }
 
@@ -54,7 +54,7 @@ declare namespace KarhooSdk {
     paymentNonce: string
   ) => Promise<TripInfo>;
   const cancellationFee: (followCode: string) => Promise<CancellationFeeInfo>;
-  const cancelTrip: (followCode: string) => Promise<TripCancelledInfo>;
+  const cancelTrip: (followCode: string) => Promise<CancelledTripInfo>;
 }
 
 export = KarhooSdk;

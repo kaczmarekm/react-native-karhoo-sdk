@@ -23,18 +23,25 @@
   "readmeFilename": "README.md",
   "peerDependencies": {
     "react": "*",
-    "react-native": "*"
+    "react-native": "*",
+    "jest": "*",
+    "jest-config": "*",
+    "@types/jest": "*"
   },
   "devDependencies": {
     "react": "^18.1.0",
-    "react-native": "^0.70.4"
+    "react-native": "^0.70.4",
+    "jest": "^29.3.1",
+    "jest-config": "^29.3.1",
+    "@types/jest": "^29.2.2"
   },
   "files": [
     "android/",
     "ios/",
     "index.js",
     "index.d.ts",
-    "react-native-karhoo-sdk.podspec"
+    "react-native-karhoo-sdk.podspec",
+    "jestMock.js"
   ],
   "types": "./index.d.ts"
 }

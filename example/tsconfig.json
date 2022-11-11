@@ -1,8 +1,12 @@
 {
-    "extends": "@tsconfig/react-native/tsconfig.json",
     "compilerOptions": {
+        "baseUrl": "src",
+        "jsx": "react-native",
+        "rootDir": "src",
         "skipLibCheck": true,
         "typeRoots": ["node_modules/@types"],
-        "types": ["@types/styled-components-react-native"]
+        "types": ["jest", "@types/styled-components-react-native"],
+        "esModuleInterop": true,
+        "allowSyntheticDefaultImports": true
     }
 }

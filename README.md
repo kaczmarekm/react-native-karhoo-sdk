@@ -1,35 +1,63 @@
 # react-native-karhoo-sdk v1.2.0
 
-## 1. Getting started
+- [Description](#description)
+- [Installation](#started)
+- [Setup](#setup)
+  - [Follow Braintree docs](#follow-braintree-docs)
+    - [Android](#android)
+    - [iOS](#iOS)
+- [Usage](#usage)
+  - [Import](#import)
+  - [Initialize SKD](#initialize-sdk)
+  - [Obtain payment nonce](#obtain-payment-nonce)
+  - [Book a ride](#book-a-ride)
+  - [Get cancellation fee](#get-cancellation-fee)
+  - [Cancel a trip](#cancel-a-trip)
+  - [Using Jest mock](#using-jest-mock)
+- [Running example project](#running-example-project)
 
+# Description
+
+This is a simple wrapper to some of functionalities offered by [Network SDK](https://developer.karhoo.com/docs/introduction-to-network-sdk) created by [Karhoo](https://www.karhoo.com/).
+Using this react-native wrapper you can:
+
+- obtain payment nonce
+- book a ride
+- obtain cancellation fee info
+- cancel a ride
+
+# Getting started
+
+`$ yarn add @iteratorsmobile/react-native-karhoo-sdk` or
 `$ npm install @iteratorsmobile/react-native-karhoo-sdk --save`
-or
-`$ yarn add @iteratorsmobile/react-native-karhoo-sdk`
 
-## 2 Follow Braintree docs
+# Setup
 
-### 2.1. Android
+### Follow Braintree docs
 
-#### 2.1.1. Update project level `build.gradle`:
+#### Android
+
+##### Update project level `build.gradle`:
 
 ```
-maven { url 'https://jitpack.io' }
-maven {
-    url "https://cardinalcommerceprod.jfrog.io/artifactory/android"
-    credentials {
-        username 'braintree_team_sdk'
-        password 'AKCp8jQcoDy2hxSWhDAUQKXLDPDx6NYRkqrgFLRc3qDrayg6rrCbJpsKKyMwaykVL8FWusJpp'
+repositories {
+    maven {
+        url "https://cardinalcommerceprod.jfrog.io/artifactory/android"
+        credentials {
+            username 'braintree_team_sdk'
+            password 'AKCp8jQcoDy2hxSWhDAUQKXLDPDx6NYRkqrgFLRc3qDrayg6rrCbJpsKKyMwaykVL8FWusJpp'
+        }
     }
 }
 ```
 
-#### 2.1.2. Update app level `build.gradle`:
+##### Update app level `build.gradle`:
 
 ```
-implementation 'com.braintreepayments.api:drop-in:5.+'
+implementation 'com.braintreepayments.api:drop-in:6.4.0'
 ```
 
-#### 2.1.3. Update `AndroidManifest`
+##### Update `AndroidManifest`
 
 ```
 <activity android:name="com.braintreepayments.api.BraintreeBrowserSwitchActivity"
@@ -43,21 +71,23 @@ implementation 'com.braintreepayments.api:drop-in:5.+'
 </activity>
 ```
 
-### 2.2. iOS
+#### iOS
 
-#### 2.2.1. Update `Podfile`
+##### Update `Podfile`
 
 ```
 pod 'Braintree'
 pod 'BraintreeDropIn', :modular_headers => true
 ```
 
-#### 2.2.2. Update `AppDelegate.mm`
+##### Update `AppDelegate.mm`
 
 ```
 // imports
 #import "BraintreeCore.h"
 ```
+
+Add function to handle payment URL scheme:
 
 ```
 - (NSString *)paymentsURLScheme {
@@ -66,18 +96,18 @@ pod 'BraintreeDropIn', :modular_headers => true
 }
 ```
 
+Add before `return YES;` line:
+
 ```
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
 
-    /*
-        ...other code
-        add ...
-    */
+    // ...
     [BTAppContextSwitcher setReturnURLScheme:self.paymentsURLScheme];
-
     return YES;
 }
 ```
+
+Add openURL handler or edit existing one:
 
 ```
 - (BOOL)application:(UIApplication *)app openURL:(NSURL *)url options:(NSDictionary<UIApplicationOpenURLOptionsKey,id> *)options {
@@ -92,7 +122,7 @@ pod 'BraintreeDropIn', :modular_headers => true
 ```
 
 NOTE:
-if you are using RCTLinkingManager it has to be placed in last if statement, eg:
+If you are using RCTLinkingManager it has to be placed in last if statement, eg:
 
 ```
 if ([url.scheme localizedCaseInsensitiveCompare:([NSString stringWithFormat:@"%@%@", self.paymentsURLScheme)] == NSOrderedSame) {
@@ -102,82 +132,110 @@ if ([url.scheme localizedCaseInsensitiveCompare:([NSString stringWithFormat:@"%@
 }
 ```
 
-##### 2.2.3. Register URL Type:
+##### Register payment URL type:
 
 3.1 For each target in your app, in XCode go to App Target > Info > URL Types
 3.2 Click '+', add URL `${bundleId}.payments`, where `${bundleId}` is your app bundle id
 
-##### 2.2.4. Add required permission:
+##### Add required permissions:
 
 - `NSLocationWhenInUseUsageDescription`
 
-## 3. Usage
+# Usage
 
-### 3.1. Import
+#### Import
 
 ```javascript
 import KarhooSdk from "@iteratorsmobile/react-native-karhoo-sdk";
 ```
 
-### 3.2. Before using other features you have to initialize sdk:
+Note:
+You can also import [predefined types]("./index.d.ts").
+
+#### Initialize sdk
+
+This step is required before using any other function from this library.
 
 ```javascript
-KarhooSdk.initialize(
-    identifie,
-    referer,
-    organisationId,
-    isProduction,
-): void;
+KarhooSdk.initialize(identifier, referer, organisationId, isProduction);
 ```
 
-### 3.3. Obtain payment nonce..
+#### Obtain payment nonce
 
 ```javascript
-KarhooSdk.getPaymentNonce(
-    organisationId,
-    paymentData: {
-        currency,
-        amount,
-    },
-): Promise<PaymentNonce>;
+const paymentNonce: PaymentNonce = await KarhooSdk.getPaymentNonce(
+  organisationId,
+  {
+    currency,
+    amount,
+  }
+);
 ```
 
-### 3.4. ...and pass along with other booking data t book a ride
+#### Book a ride
 
 ```javascript
-KarhooSdk.bookTrip(
-    {
-        firstName,
-        lastName,
-        email,
-        mobileNumber,
-        locale,
-    },
-    quoteId,
-    paymentNonce,
-): Promise<TripInfo>
+const tripInfo: TripInfo = await KarhooSdk.bookTrip(
+  {
+    firstName,
+    lastName,
+    email,
+    mobileNumber,
+    locale,
+  },
+  quoteId,
+  paymentNonce
+);
 ```
 
-### 3.5. Get cancellation fee data...
+#### Get cancellation fee
 
-- this step is not required, but user should be acquainted with cancellation fee amount before he cancels ride
+This step is not required, but user should be acquainted with cancellation fee amount before he cancels a ride.
 
 ```javascript
-KarhooSdk.cancellationFee(followCode): Promise<CancellationFeeInfo>;
+const cancellationFeeInfo: CancellationFeeInfo =
+  await KarhooSdk.cancellationFee(followCode);
 ```
 
-### 3.6. ...before you cancel trip
+#### Cancel a trip
 
 ```javascript
-KarhooSdk.cancelTrip(followCode): Promise<TripCancelledInfo>;
+const cancelledTripInfo: CancelledTripInfo = KarhooSdk.cancelTrip(followCode);
 ```
 
-## 4. Running example project
+#### Using Jest mock
 
-### 4.1. Install dependencies
+Add following mock to your Jest setup files:
+
+```javascript
+import { mockReactNativeKarhooSdk } from "@iteratorsmobile/react-native-karhoo-sdk/jestMock";
+
+jest.mock(
+  "@iteratorsmobile/react-native-karhoo-sdk",
+  () => mockReactNativeKarhooSdk
+);
+```
+
+# Running example project
+
+#### Install dependencies
 
 `$ yarn && cd example && yarn && cd ios && pod install && cd .. && clear`
 
-### 4.2. Run
+#### Setup
 
-Start 'example' project just as a normal react-native project.
+Create `.env` file under `<libraryRootDir>/example/` directory. Paste this:
+
+```
+KARHOO_ORGANISATION_ID=
+KARHOO_REFERER_ID=
+KARHOO_IDENTIFIER=
+```
+
+And then add values obtained from Karhoo team.
+
+#### Run
+
+Start 'example' project just as a normal react-native project:
+`$ yarn android` or
+`$ yarn ios`

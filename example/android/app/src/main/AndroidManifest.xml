@@ -1,5 +1,6 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-  package="com.example">
+<manifest 
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  package="com.iteratorsmobile.lib.karhoo.example">
 
     <uses-permission android:name="android.permission.INTERNET" />
 
@@ -24,7 +25,8 @@
       </activity>
       <activity 
         android:name="com.braintreepayments.api.BraintreeBrowserSwitchActivity"
-        android:launchMode="singleTask">
+        android:launchMode="singleTask"
+        android:exported="true">
           <intent-filter>
               <action android:name="android.intent.action.VIEW" />
               <category android:name="android.intent.category.DEFAULT" />
