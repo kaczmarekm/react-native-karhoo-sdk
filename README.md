@@ -208,7 +208,7 @@ const cancelledTripInfo: CancelledTripInfo = KarhooSdk.cancelTrip(followCode);
 Add following mock to your Jest setup files:
 
 ```javascript
-import { mockReactNativeKarhooSdk } from "@iteratorsmobile/react-native-karhoo-sdk/jestMock";
+import mockReactNativeKarhooSdk from "@iteratorsmobile/react-native-karhoo-sdk/jestMock";
 
 jest.mock(
   "@iteratorsmobile/react-native-karhoo-sdk",

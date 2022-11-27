@@ -1,4 +1,4 @@
-import { mockReactNativeKarhooSdk } from '@iteratorsmobile/react-native-karhoo-sdk/jestMock';
+import mockReactNativeKarhooSdk from '@iteratorsmobile/react-native-karhoo-sdk/jestMock';
 
 jest.useFakeTimers();
 

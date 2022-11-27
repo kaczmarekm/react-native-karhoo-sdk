@@ -1,12 +1,13 @@
 package com.iteratorsmobile.lib.karhoo;
 
-import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
-import android.os.Handler;
-import android.os.Looper;
-import com.braintreepayments.*;
-import com.facebook.react.bridge.ActivityEventListener;
+import androidx.annotation.NonNull;
+import com.braintreepayments.api.DropInClient;
+import com.braintreepayments.api.DropInListener;
+import com.braintreepayments.api.DropInRequest;
+import com.braintreepayments.api.DropInResult;
+import com.braintreepayments.api.ThreeDSecureRequest;
+import com.braintreepayments.api.UserCanceledException;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
@@ -14,76 +15,104 @@ import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableMap;
-import com.karhoo.sdk.*;
+import com.karhoo.sdk.analytics.AnalyticProvider;
+import com.karhoo.sdk.api.KarhooApi;
+import com.karhoo.sdk.api.KarhooEnvironment;
+import com.karhoo.sdk.api.KarhooSDKConfiguration;
+import com.karhoo.sdk.api.model.AuthenticationMethod;
+import com.karhoo.sdk.api.model.BookingFee;
+import com.karhoo.sdk.api.model.BookingFeePrice;
+import com.karhoo.sdk.api.model.BraintreeSDKToken;
+import com.karhoo.sdk.api.model.CancellationReason;
+import com.karhoo.sdk.api.model.TripInfo;
+import com.karhoo.sdk.api.network.request.Luggage;
+import com.karhoo.sdk.api.network.request.PassengerDetails;
+import com.karhoo.sdk.api.network.request.Passengers;
+import com.karhoo.sdk.api.network.request.SDKInitRequest;
+import com.karhoo.sdk.api.network.request.TripBooking;
+import com.karhoo.sdk.api.network.request.TripCancellation;
+import com.karhoo.sdk.api.network.response.Resource;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import kotlin.Unit;
-import kotlin.jvm.functions.Function1;
+import kotlin.coroutines.Continuation;
+import kotlin.jvm.functions.Function0;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-
-public class KarhooSdkModule extends ReactContextBaseJavaModule implements ActivityEventListener {
-    protected static final int PAYMENT_NONCE_REQUEST_CODE = 1;
-    protected static final String EVENT_ACTIVITY_DOES_NOT_EXIST = "EVENT_ACTIVITY_DOES_NOT_EXIST";
-    protected static final String EVENT_CANCELLED = "EVENT_CANCELLED";
-    protected static final String EVENT_FAILED = "EVENT_FAILED";
+public class KarhooSdkModule extends ReactContextBaseJavaModule implements DropInListener {
+    protected static final String PAYMENT_NONCE_CANCELLED = "PAYMENT_NONCE_CANCELLED";
+    protected static final String PAYMENT_NONCE_FAILED = "PAYMENT_NONCE_FAILED";
     protected static final String BOOKING_FAILED = "BOOKING_FAILED";
     protected static final String TRIP_CANCEL_FAILED = "TRIP_CANCEL_FAILED";
-    protected static final String CANCELLATION_FEE_RETRIEVE_FAILED = "CANCELLATION_FEE_RETRIEVE_FAILED";
-
+    protected static final String CANCELLATION_FEE_FAILED = "CANCELLATION_FEE_FAILED";
 
     private final ReactApplicationContext reactContext;
 
     private Promise paymentNoncePromise;
+    private String paymentNonceCorrelationId;
 
     public KarhooSdkModule(ReactApplicationContext reactContext) {
         super(reactContext);
         this.reactContext = reactContext;
-        reactContext.addActivityEventListener(this);
     }
 
+    @NonNull
     @Override
     public String getName() {
         return "KarhooSdk";
     }
 
-    public void onActivityResult(Activity activity, int requestCode, int resultCode, Intent data) {
-        if (requestCode == PAYMENT_NONCE_REQUEST_CODE) {
-            if (resultCode == Activity.RESULT_OK) {
-                try {
-                    DropInResult dropInResult = data.getParcelableExtra(DropInResult.EXTRA_DROP_IN_RESULT);
-                    PaymentMethodNonce paymentMethodNonce = dropInResult.getPaymentMethodNonce();
-
-                    CardNonce cardNonce = (CardNonce) paymentMethodNonce;
-                    if (cardNonce != null) {
-                        if (cardNonce.getThreeDSecureInfo().isLiabilityShifted()) {
-                            WritableMap response = Arguments.createMap();
-                            response.putString("nonce", paymentMethodNonce.getNonce());
-                            paymentNoncePromise.resolve(response);
-                        } else {
-                            paymentNoncePromise.reject(EVENT_FAILED, "Liability shift not possible.");
-                        }
-                    } else {
-                        paymentNoncePromise.reject(EVENT_FAILED, "Error occurred while getting payment nonce.");
-                    }
-                } catch (Exception e) {
-                    paymentNoncePromise.reject(EVENT_FAILED, e);
-                }
-            } else if (resultCode == Activity.RESULT_CANCELED) {
-                paymentNoncePromise.reject(EVENT_CANCELLED, "Cancelled.");
-            } else {
-                Exception error = (Exception) data.getSerializableExtra(DropInActivity.EXTRA_ERROR);
-                paymentNoncePromise.reject(EVENT_FAILED, error);
-            }
+    @Override
+    public void onDropInSuccess(@NonNull DropInResult result) {
+        WritableMap response = Arguments.createMap();
+        response.putString("correlationId", this.paymentNonceCorrelationId);
+        try {
+            String paymentMethodNonce = Objects.requireNonNull(result.getPaymentMethodNonce(), "Received empty payment nonce.").getString();
+            response.putString("nonce", paymentMethodNonce);
+            this.paymentNoncePromise.resolve(response);
+        } catch (NullPointerException exception) {
+            response.putString("error", exception.getMessage());
+            this.paymentNoncePromise.reject(PAYMENT_NONCE_FAILED, exception.getMessage());
         }
     }
 
-    public void onNewIntent(Intent intent) {}
+    @Override
+    public void onDropInFailure(@NonNull Exception error) {
+        WritableMap response = Arguments.createMap();
+        response.putString("correlationId", this.paymentNonceCorrelationId);
+        if (error instanceof UserCanceledException) {
+            this.paymentNoncePromise.reject(PAYMENT_NONCE_CANCELLED, response);
+        } else {
+            response.putString("error", error.getMessage());
+            this.paymentNoncePromise.reject(PAYMENT_NONCE_FAILED, response);
+        }
+    }
+
+    private WritableMap getKarhooErrorResponse(Resource.Failure karhooFailure) {
+        WritableMap errorResponse = Arguments.createMap();
+        errorResponse.putString("error", karhooFailure.getError().getUserFriendlyMessage());
+        errorResponse.putString("correlationId", karhooFailure.getCorrelationId());
+        return errorResponse;
+    }
+
+    private WritableMap getSdkErrorResponse(Exception error) {
+        WritableMap errorResponse = Arguments.createMap();
+        errorResponse.putString("error", error.getMessage());
+        errorResponse.putString("correlationId", null);
+        return errorResponse;
+    }
 
     @ReactMethod
     public void initialize(final String identifier, final String referer, final String organisationId, final boolean isProduction) {
         KarhooApi.INSTANCE.setConfiguration(new KarhooSDKConfiguration() {
+            @androidx.annotation.Nullable
+            @Override
+            public Object requireSDKAuthentication(@NonNull Function0<Unit> function0, @NonNull Continuation<? super Unit> continuation) {
+                return null;
+            }
+
             @NotNull
             @Override
             public KarhooEnvironment environment() {
@@ -93,7 +122,7 @@ public class KarhooSdkModule extends ReactContextBaseJavaModule implements Activ
             @NotNull
             @Override
             public Context context() {
-                return getCurrentActivity();
+                return Objects.requireNonNull(getCurrentActivity());
             }
 
             @NotNull
@@ -112,48 +141,40 @@ public class KarhooSdkModule extends ReactContextBaseJavaModule implements Activ
 
     @ReactMethod
     public void getPaymentNonce(final String organisationId, final ReadableMap paymentData, final Promise promise) {
-        new Handler(Looper.getMainLooper()).post(new Runnable() {
-            @Override
-            public void run() {
-                final Activity currentActivity = getCurrentActivity();
+        try {
+            this.paymentNoncePromise = promise;
+            SDKInitRequest sdkInitRequest = new SDKInitRequest(organisationId, Objects.requireNonNull(paymentData.getString("currency")));
+            KarhooApi.INSTANCE.getPaymentsService().initialisePaymentSDK(sdkInitRequest).execute(
+                    resource -> {
+                        if (resource instanceof Resource.Success) {
+                            this.paymentNonceCorrelationId = ((Resource.Success<? extends BraintreeSDKToken>) resource).getCorrelationId();
+                            String token = ((Resource.Success<? extends BraintreeSDKToken>) resource).getData().getToken();
 
-                if (currentActivity == null) {
-                    promise.reject(EVENT_ACTIVITY_DOES_NOT_EXIST, "Activity doesn't exist");
-                    return;
-                }
+                            ThreeDSecureRequest threeDSecureRequest = new ThreeDSecureRequest();
+                            threeDSecureRequest.setAmount(paymentData.getString("amount"));
+                            threeDSecureRequest.setVersionRequested(ThreeDSecureRequest.VERSION_2);
 
-                paymentNoncePromise = promise;
+                            DropInRequest dropInRequest = new DropInRequest();
+                            dropInRequest.setThreeDSecureRequest(threeDSecureRequest);
 
-                try {
-                    SDKInitRequest sdkInitRequest = new SDKInitRequest(organisationId, paymentData.getString("currency"));
-                    KarhooApi.INSTANCE.getPaymentsService().initialisePaymentSDK(sdkInitRequest).execute(
-                            new Function1<Resource<? extends BraintreeSDKToken>, Unit>() {
-                                @Override
-                                public Unit invoke(Resource<? extends BraintreeSDKToken> resource) {
-                                    if (resource instanceof Resource.Success) {
-                                        String token = ((Resource.Success<BraintreeSDKToken>) resource).getData().getToken();
-                                        ThreeDSecureRequest threeDSecureRequest = new ThreeDSecureRequest()
-                                                .amount(paymentData.getString("amount"))
-                                                .versionRequested(ThreeDSecureRequest.VERSION_2);
-                                        DropInRequest dropInRequest = new DropInRequest()
-                                                .clientToken(token)
-                                                .requestThreeDSecureVerification(true)
-                                                .threeDSecureRequest(threeDSecureRequest);
-                                        currentActivity.startActivityForResult(dropInRequest.getIntent(reactContext), PAYMENT_NONCE_REQUEST_CODE);
-                                    } else {
-                                        paymentNoncePromise.reject(EVENT_FAILED, ((Resource.Failure) resource).getError().getUserFriendlyMessage());
-                                        paymentNoncePromise = null;
-                                    }
-                                    return Unit.INSTANCE;
-                                }
-                            }
-                    );
-                } catch (Exception e) {
-                    paymentNoncePromise.reject(EVENT_FAILED, e);
-                    paymentNoncePromise = null;
-                }
-            }
-        });
+                            DropInClient dropInClient = new DropInClient(reactContext, token, dropInRequest);
+                            dropInClient.setListener(this);
+                            dropInClient.launchDropIn(dropInRequest);
+                        } else {
+                            this.paymentNoncePromise.reject(PAYMENT_NONCE_FAILED, getKarhooErrorResponse((Resource.Failure<? extends BraintreeSDKToken>) resource));
+
+                            this.paymentNoncePromise = null;
+                            this.paymentNonceCorrelationId = null;
+                        }
+                        return Unit.INSTANCE;
+                    }
+            );
+        } catch (Exception error) {
+            this.paymentNoncePromise.reject(PAYMENT_NONCE_FAILED, getSdkErrorResponse(error));
+
+            this.paymentNoncePromise = null;
+            this.paymentNonceCorrelationId = null;
+        }
     }
 
     @ReactMethod
@@ -168,27 +189,24 @@ public class KarhooSdkModule extends ReactContextBaseJavaModule implements Activ
             ));
             Luggage luggage = new Luggage(0);
             Passengers passengers = new Passengers(0, passengersList, luggage);
-            TripBooking tripBooking = new TripBooking(null, null, null, null, passengers, null, paymentNonce, null, null, null, 0, quoteId);
+            TripBooking tripBooking = new TripBooking(null, null, null, null, passengers, null, paymentNonce, null, null, null, null, 0, quoteId);
+
             KarhooApi.INSTANCE.getTripService().book(tripBooking).execute(
-                    new Function1<Resource<? extends TripInfo>, Unit>() {
-                        @Override
-                        public Unit invoke(Resource<? extends TripInfo> resource) {
-                            if (resource instanceof Resource.Success) {
-                                String tripId = ((Resource.Success<TripInfo>) resource).getData().getTripId();
-                                String followCode = ((Resource.Success<TripInfo>) resource).getData().getFollowCode();
-                                WritableMap response = Arguments.createMap();
-                                response.putString("tripId", tripId);
-                                response.putString("followCode", followCode);
-                                promise.resolve(response);
-                            } else {
-                                promise.reject(BOOKING_FAILED, ((Resource.Failure) resource).getError().getUserFriendlyMessage());
-                            }
-                            return Unit.INSTANCE;
+                    resource -> {
+                        if (resource instanceof Resource.Success) {
+                            WritableMap successResponse = Arguments.createMap();
+                            successResponse.putString("tripId", ((Resource.Success<TripInfo>) resource).getData().getTripId());
+                            successResponse.putString("followCode", ((Resource.Success<TripInfo>) resource).getData().getFollowCode());
+                            successResponse.putString("correlationId", ((Resource.Success<TripInfo>) resource).getCorrelationId());
+                            promise.resolve(successResponse);
+                        } else {
+                            promise.reject(BOOKING_FAILED, getKarhooErrorResponse((Resource.Failure<TripInfo>) resource));
                         }
+                        return Unit.INSTANCE;
                     }
             );
-        } catch (Exception e) {
-            promise.reject(BOOKING_FAILED, e);
+        } catch (Exception error) {
+            promise.reject(BOOKING_FAILED, getSdkErrorResponse(error));
         }
     }
 
@@ -196,59 +214,53 @@ public class KarhooSdkModule extends ReactContextBaseJavaModule implements Activ
     public void cancellationFee(String followCode, final Promise promise) {
         try {
             KarhooApi.INSTANCE.getTripService().cancellationFee(followCode).execute(
-                    new Function1<Resource<? extends BookingFee>, Unit>() {
-                        @Override
-                        public Unit invoke(Resource<? extends BookingFee> resource) {
-                            if (resource instanceof Resource.Success) {
-                                boolean cancellationFee = ((Resource.Success<BookingFee>) resource).getData().getCancellationFee();
-                                BookingFeePrice bookingFeePrice = ((Resource.Success<BookingFee>) resource).getData().getFee();
+                    resource -> {
+                        if (resource instanceof Resource.Success) {
+                            WritableMap successResponse = Arguments.createMap();
+                            successResponse.putBoolean("cancellationFee", ((Resource.Success<BookingFee>) resource).getData().getCancellationFee());
+                            successResponse.putString("correlationId", ((Resource.Success<BookingFee>) resource).getCorrelationId());
 
-                                WritableMap response = Arguments.createMap();
-                                response.putBoolean("cancellationFee", cancellationFee);
+                            BookingFeePrice bookingFeePrice = ((Resource.Success<BookingFee>) resource).getData().getFee();
+                            if (bookingFeePrice != null) {
+                                WritableMap bookingFeePriceMap = Arguments.createMap();
+                                bookingFeePriceMap.putString("currency", bookingFeePrice.getCurrency());
+                                bookingFeePriceMap.putString("type", bookingFeePrice.getType());
+                                bookingFeePriceMap.putDouble("value", bookingFeePrice.getValue());
 
-                                if (bookingFeePrice != null) {
-                                    WritableMap bookingFeePriceMap = Arguments.createMap();
-                                    bookingFeePriceMap.putString("currency", bookingFeePrice.getCurrency());
-                                    bookingFeePriceMap.putString("type", bookingFeePrice.getType());
-                                    bookingFeePriceMap.putDouble("value", bookingFeePrice.getValue());
-
-                                    response.putMap("fee", bookingFeePriceMap);
-                                }
-
-                                promise.resolve(response);
-                            } else {
-                                promise.reject(CANCELLATION_FEE_RETRIEVE_FAILED, ((Resource.Failure) resource).getError().getUserFriendlyMessage());
+                                successResponse.putMap("fee", bookingFeePriceMap);
                             }
-                            return Unit.INSTANCE;
+
+                            promise.resolve(successResponse);
+                        } else {
+                            promise.reject(CANCELLATION_FEE_FAILED, getKarhooErrorResponse((Resource.Failure<BookingFee>) resource));
                         }
+                        return Unit.INSTANCE;
                     }
             );
-        } catch (Exception e) {
-            promise.reject(CANCELLATION_FEE_RETRIEVE_FAILED, e);
+        } catch (Exception error) {
+            promise.reject(CANCELLATION_FEE_FAILED, getSdkErrorResponse(error));
         }
     }
 
     @ReactMethod
     public void cancelTrip(String followCode, final Promise promise) {
         try {
-            TripCancellation tripCancellation = new TripCancellation(followCode, CancellationReason.OTHER_USER_REASON, "");
+            TripCancellation tripCancellation = new TripCancellation(followCode, CancellationReason.OTHER_USER_REASON, null);
             KarhooApi.INSTANCE.getTripService().cancel(tripCancellation).execute(
-                   new Function1<Resource<? extends Void>, Unit>() {
-                       @Override
-                       public Unit invoke(Resource<? extends Void> resource) {
-                           if (resource instanceof Resource.Success) {
-                               WritableMap response = Arguments.createMap();
-                               response.putBoolean("tripCancelled", true);
-                               promise.resolve(response);
-                           } else {
-                               promise.reject(TRIP_CANCEL_FAILED, ((Resource.Failure) resource).getError().getUserFriendlyMessage());
-                           }
-                           return Unit.INSTANCE;
-                       }
-                   }
+                    resource -> {
+                        if (resource instanceof Resource.Success) {
+                            WritableMap successResponse = Arguments.createMap();
+                            successResponse.putBoolean("tripCancelled", true);
+                            successResponse.putString("correlationId", ((Resource.Success<? extends Void>) resource).getCorrelationId());
+                            promise.resolve(successResponse);
+                        } else {
+                            promise.reject(TRIP_CANCEL_FAILED, getKarhooErrorResponse((Resource.Failure<? extends Void>) resource));
+                        }
+                        return Unit.INSTANCE;
+                    }
             );
-        } catch (Exception e) {
-            promise.reject(TRIP_CANCEL_FAILED, e);
+        } catch (Exception error) {
+            promise.reject(TRIP_CANCEL_FAILED, getSdkErrorResponse(error));
         }
     } 
 }
