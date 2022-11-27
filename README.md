@@ -28,7 +28,10 @@ Using this react-native wrapper you can:
 
 # Getting started
 
-`$ yarn add @iteratorsmobile/react-native-karhoo-sdk` or
+`$ yarn add @iteratorsmobile/react-native-karhoo-sdk`
+
+or
+
 `$ npm install @iteratorsmobile/react-native-karhoo-sdk --save`
 
 # Setup
@@ -150,7 +153,7 @@ import KarhooSdk from "@iteratorsmobile/react-native-karhoo-sdk";
 ```
 
 Note:
-You can also import [predefined types]("./index.d.ts").
+You can also import [predefined types](index.d.ts).
 
 #### Initialize sdk
 
