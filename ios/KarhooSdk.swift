@@ -1,177 +1,6 @@
 import KarhooSDK
 import BraintreeDropIn
 
-@objc(KarhooSdk)
-class KarhooSdk: NSObject {
-    static let PAYMENT_NONCE_CANCELLED = "PAYMENT_NONCE_CANCELLED";
-    static let PAYMENT_NONCE_FAILED = "PAYMENT_NONCE_FAILED";
-    static let BOOKING_FAILED = "BOOKING_FAILED";
-    static let TRIP_CANCEL_FAILED = "TRIP_CANCEL_FAILED";
-    static let CANCELLATION_FEE_FAILED = "CANCELLATION_FEE_RETRIEVE_FAILED";
-    
-    @objc func initialize(_ identifier: String, referer: String, organisationId: String, isProduction: Bool) -> Void {
-        Karhoo.set(configuration: KarhooConfiguration(identifier: identifier, referer: referer, organisationId: organisationId, isProduction: isProduction))
-    }
-
-    @objc func getPaymentNonce(_ organisationId: String, paymentData: NSDictionary, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) -> Void {
-        Karhoo
-            .getPaymentService()
-            .initialisePaymentSDK(paymentSDKTokenPayload: PaymentSDKTokenPayload(organisationId: organisationId, currency: paymentData["currency"] as! String))
-            .execute { result in
-                switch result {
-                    case .success(let result, let correlationId):
-                        let amountString = paymentData["amount"] as! String
-                        let amountDecimal = Decimal(string: amountString)
-                        
-                        if (amountDecimal == nil) {
-                            let errorDict: NSDictionary = [
-                                "error": "PaymentData.amount not formatted correclty",
-                                "correlationId": correlationId!
-                            ]
-                            reject(KarhooSdk.PAYMENT_NONCE_FAILED, nil, errorDict as? Error)
-                            return;
-                        }
-                        
-                        let amountNSDecimalNumber = NSDecimalNumber(decimal: amountDecimal!)
-                        
-                        let threeDSecureRequest = BTThreeDSecureRequest()
-                        threeDSecureRequest.amount = amountNSDecimalNumber
-                        threeDSecureRequest.versionRequested = .version2
-                        
-                        let dropInRequest = BTDropInRequest()
-                        dropInRequest.threeDSecureRequest = threeDSecureRequest
-                        
-                        let dropIn = BTDropInController(authorization: result.token, request: dropInRequest) {
-                            (controller, result, error) in
-                                if (error != nil) {
-                                    let errorDict: NSDictionary = [
-                                        "error": "Unknown error",
-                                        "correlationId": correlationId!
-                                    ]
-                                    reject(KarhooSdk.PAYMENT_NONCE_FAILED, nil, errorDict as? Error)
-                                    controller.dismiss(animated: true, completion: nil)
-                                } else if (result?.isCanceled == true) {
-                                    let errorDict: NSDictionary = [
-                                        "error": "Cancelled by user",
-                                        "correlationId": correlationId!
-                                    ]
-                                    reject(KarhooSdk.PAYMENT_NONCE_CANCELLED, nil, errorDict as? Error)
-                                    controller.dismiss(animated: true, completion: nil)
-                                } else if let result = result {
-                                    let nonce = result.paymentMethod?.nonce
-                                    let resultDict: NSDictionary = [
-                                        "nonce": nonce!,
-                                        "correlationId": correlationId!
-                                    ]
-                                    resolve(resultDict)
-                                    controller.dismiss(animated: true, completion: nil)
-                                }
-                        }
-                        let rootViewController = UIApplication.shared.delegate?.window??.rootViewController
-                        rootViewController?.present(dropIn!, animated: true, completion: nil)
-                    case .failure(let error, let correlationId):
-                        let errorDict: NSDictionary = [
-                            "error": error.debugDescription,
-                            "correlationId": correlationId!
-                        ]
-                        reject(KarhooSdk.PAYMENT_NONCE_FAILED, nil, errorDict as? Error)
-                }
-            }
-    }
-
-    @objc func bookTrip(_ passenger: NSDictionary, quoteId: String, paymentNonce: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) -> Void {
-        let passengers = Passengers(
-            additionalPassengers: 0,
-            passengerDetails: [
-                PassengerDetails(
-                    firstName: passenger["firstName"] as! String,
-                    lastName: passenger["lastName"] as! String,
-                    email: passenger["email"] as! String,
-                    phoneNumber: passenger["mobileNumber"] as! String,
-                    locale: passenger["locale"] as! String
-                )
-            ]
-        )
-        let tripBooking = TripBooking(
-            quoteId: quoteId,
-            passengers: passengers,
-            flightNumber: nil,
-            paymentNonce: paymentNonce,
-            comments: nil
-        )
-        Karhoo
-            .getTripService()
-            .book(tripBooking: tripBooking)
-            .execute { result in
-                switch result {
-                    case .success(let trip, let correlationId):
-                        let resultDict: NSDictionary = [
-                            "tripId": trip.tripId,
-                            "followCode": trip.followCode,
-                            "correlationId": correlationId!,
-                        ]
-                        resolve(resultDict)
-                    case .failure(let error, let correlationId):
-                        let errorDict: NSDictionary = [
-                            "error": error.debugDescription,
-                            "correlationId": correlationId!
-                        ]
-                        reject(KarhooSdk.BOOKING_FAILED, nil, errorDict as? Error)
-                }
-            }
-    }
-
-    @objc func cancellationFee(_ followCode: NSString, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) -> Void {
-        Karhoo
-            .getTripService()
-            .cancellationFee(identifier: followCode as String)
-            .execute { result in
-                switch result {
-                    case .success(let bookingFee, let correlationId):
-                        let resultDict: NSDictionary = [
-                            "cancellationFee": bookingFee.cancellationFee,
-                            "fee":  [
-                                "currency": bookingFee.fee.currency,
-                                "type": bookingFee.fee.value,
-                                "value": bookingFee.fee.value,
-                            ],
-                            "correlationId": correlationId!
-                        ]
-                        resolve(resultDict)
-                    case .failure(let error, let correlationId):
-                        let errorDict: NSDictionary = [
-                            "error": error.debugDescription,
-                            "correlationId": correlationId!
-                        ]
-                        reject(KarhooSdk.CANCELLATION_FEE_FAILED, nil, errorDict as? Error)
-                }
-            }
-    }
-
-    @objc func cancelTrip(_ followCode: NSString, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) -> Void {
-        let tripCancellation = TripCancellation(tripId: followCode as String, cancelReason: .notNeededAnymore)
-        Karhoo
-            .getTripService()
-            .cancel(tripCancellation: tripCancellation)
-            .execute { result in
-                switch result {
-                    case .success(_, let correlationId):
-                        let resultDict: NSDictionary = [
-                            "tripCancelled": true,
-                            "correlationId": correlationId!
-                        ]
-                        resolve(resultDict)
-                    case .failure(let error, let correlationId):
-                        let errorDict: NSDictionary = [
-                            "error": error.debugDescription,
-                            "correlationId": correlationId!
-                        ]
-                        reject(KarhooSdk.TRIP_CANCEL_FAILED, nil, errorDict as? Error)
-                }
-            }
-    }
-}
-
 struct KarhooConfiguration: KarhooSDKConfiguration {
     var identifier: String
     var referer: String
@@ -193,3 +22,71 @@ struct KarhooConfiguration: KarhooSDKConfiguration {
         return .guest(settings: GuestSettings(identifier: self.identifier, referer: self.referer, organisationId: self.organisationId))
     }
 }
+
+@objc(KarhooSdk)
+class KarhooSdk: NSObject { 
+    @objc func initialize(_ identifier: String, referer: String, organisationId: String, isProduction: Bool) -> Void {
+        Karhoo.set(configuration: KarhooConfiguration(identifier: identifier, referer: referer, organisationId: organisationId, isProduction: isProduction))
+    }
+
+    // KarhooUserService
+    //
+
+    @objc func register(_ registrationData: NSDictionary, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) -> Void {
+        return KarhooUserService.register(registrationData, resolve: resolve, reject: reject);
+    }
+
+    @objc func login(_ loginData: NSDictionary, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) -> Void {
+        return KarhooUserService.login(loginData, resolve: resolve, reject: reject);
+    }
+
+    @objc func logout(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) -> Void {
+        return KarhooUserService.logout(resolve, reject: reject);
+    }
+
+    @objc func currentUser(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) -> Void {
+        return KarhooUserService.currentUser(resolve, reject: reject);
+    }
+
+    // KarhooAuthService
+    //
+
+    @objc func loginWithToken(_ token: NSString, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) -> Void {
+        return KarhooAuthService.loginWithToken(token, resolve: resolve, reject: reject);
+    }
+
+    // KarhooAddressService
+    //
+
+    @objc func placeSearch(_ placeSearchData: NSDictionary, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) -> Void {
+        return KarhooAddressService.placeSearch(placeSearchData, resolve: resolve, reject: reject);
+    }
+
+    @objc func locationInfo(_ locationInfoData: NSDictionary, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) -> Void {
+        return KarhooAddressService.locationInfo(locationInfoData, resolve: resolve, reject: reject);
+    }
+
+    // KarhooPaymentService
+    // 
+
+    @objc func getPaymentNonce(_ organisationId: String, paymentData: NSDictionary, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) -> Void {        
+        return KarhooPaymentService.getPaymentNonce(organisationId, paymentData: paymentData, resolve: resolve, reject: reject);
+    }
+
+    // KarhooTripService
+    //
+    
+    @objc func bookTrip(_ bookTripData: NSDictionary, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) -> Void {
+       return KarhooTripService.bookTrip(bookTripData, resolve: resolve, reject: reject);
+    }
+
+    @objc func cancellationFee(_ followCode: NSString, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) -> Void {
+        return KarhooTripService.cancellationFee(followCode, resolve: resolve, reject: reject);
+    }
+
+    @objc func cancelTrip(_ followCode: NSString, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) -> Void {
+        return KarhooTripService.cancelTrip(followCode, resolve: resolve, reject: reject);
+    }
+}
+
+
