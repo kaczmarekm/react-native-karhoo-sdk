@@ -7,8 +7,8 @@ const Container = styled.View`
     justify-content: center;
 `;
 
-const Trip = () => {
+const TripScreen = () => {
     return <Container />;
 };
 
-export default Trip;
+export default TripScreen;

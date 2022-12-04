@@ -4,11 +4,13 @@ import { QuoteSearchState } from './types';
 const initialState: QuoteSearchState = {};
 
 const quoteSearchSlice = createSlice({
-    name: 'payment',
+    name: 'quoteSearch',
     initialState,
     reducers: {},
 });
 
 export const {} = quoteSearchSlice.actions;
 
-export default quoteSearchSlice.reducer;
+const quoteSearchReducer = quoteSearchSlice.reducer;
+
+export default quoteSearchReducer;

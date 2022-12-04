@@ -7,8 +7,8 @@ const Container = styled.View`
     justify-content: center;
 `;
 
-const QuoteSearch = () => {
+const QuoteSearchScreen = () => {
     return <Container />;
 };
 
-export default QuoteSearch;
+export default QuoteSearchScreen;

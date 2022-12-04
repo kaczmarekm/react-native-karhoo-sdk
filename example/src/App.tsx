@@ -1,3 +1,4 @@
+import KarhooSdk from '@iteratorsmobile/react-native-karhoo-sdk';
 import React, { useEffect } from 'react';
 import { SafeAreaView, StyleSheet } from 'react-native';
 import Config from 'react-native-config';
@@ -11,9 +12,14 @@ const App = () => {
             'xxx',
             Config.KARHOO_IDENTIFIER,
             Config.KARHOO_ORGANISATION_ID,
-            Config.KARHOO_REFERER_ID,
+            Config.KARHOO_REFERER,
         );
-        // KarhooSdk.initialize();
+        KarhooSdk.initialize(
+            Config.KARHOO_IDENTIFIER,
+            Config.KARHOO_REFERER,
+            Config.KARHOO_ORGANISATION_ID,
+            false,
+        );
     }, []);
 
     return (

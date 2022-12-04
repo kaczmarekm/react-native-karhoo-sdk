@@ -6,7 +6,6 @@ import { colors } from '../utils';
 const StyledButton = styled.TouchableOpacity<{ disabled?: boolean }>`
     ${({ disabled }) => !!disabled && 'opacity: 0.5;'}
     align-items: center;
-    align-self: stretch;
     background-color: ${colors.indigoDye};
     border-color: ${colors.indigoDye};
     border-radius: 6px;
@@ -14,7 +13,7 @@ const StyledButton = styled.TouchableOpacity<{ disabled?: boolean }>`
     height: 50px;
     height: 60px;
     justify-content: center;
-    max-width: 300px;
+    width: 300px;
 `;
 
 const Label = styled.Text`

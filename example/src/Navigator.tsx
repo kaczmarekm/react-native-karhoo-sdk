@@ -4,13 +4,17 @@ import {
     NativeStackNavigationOptions,
 } from '@react-navigation/native-stack';
 import React, { createRef } from 'react';
-import QuoteSearch from './quoteSearch/QuoteSearchScreen';
-import Trip from './trip/TripScreen';
+import LoginScreen from './login/LoginScreen';
+import QuoteSearchScreen from './quoteSearch/QuoteSearchScreen';
+import RegistrationScreen from './registration/RegistrationScreen';
+import TripScreen from './trip/TripScreen';
 import { colors } from './utils';
 
 const Stack = createNativeStackNavigator();
 
 interface NavigationParams {
+    Registration: undefined;
+    Login: undefined;
     QuoteSearch: undefined;
     Trip: undefined;
 }
@@ -26,9 +30,11 @@ const stackNavigatorOptions: NativeStackNavigationOptions = {
 
 export const Navigator = () => (
     <NavigationContainer ref={navigationRef}>
-        <Stack.Navigator initialRouteName="QuoteSearch" screenOptions={stackNavigatorOptions}>
-            <Stack.Screen name="QuoteSearch" component={QuoteSearch} />
-            <Stack.Screen name="Trip" component={Trip} />
+        <Stack.Navigator initialRouteName="Registration" screenOptions={stackNavigatorOptions}>
+            <Stack.Screen name="Registration" component={RegistrationScreen} />
+            <Stack.Screen name="Login" component={LoginScreen} />
+            <Stack.Screen name="QuoteSearch" component={QuoteSearchScreen} />
+            <Stack.Screen name="Trip" component={TripScreen} />
         </Stack.Navigator>
     </NavigationContainer>
 );

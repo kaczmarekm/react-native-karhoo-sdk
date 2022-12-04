@@ -4,8 +4,7 @@ import styled from 'styled-components/native';
 import { colors } from '../utils';
 
 const Container = styled.View`
-    align-self: stretch;
-    max-width: 300px;
+    width: 300px;
 `;
 
 const Row = styled.View`
